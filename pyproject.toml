@@ -1,0 +1,38 @@
+# Installs the inference package (`from watersheep import WaterSheep`).
+# The training pipeline runs from a clone: run.bat / ./run.sh set up .venv on their own.
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "watersheep"
+dynamic = ["version"]
+description = "Calibrated decisions for any text."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Samrat Dutta", email = "samratduttaofficial@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.4",
+    "numpy>=1.24",
+    "transformers>=4.48",
+    "safetensors>=0.4",
+    "huggingface_hub>=0.34",
+]
+keywords = ["decision model", "classification", "zero-shot", "calibration"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.scripts]
+watersheep = "watersheep.cli:main"
+
+[tool.setuptools]
+packages = ["watersheep"]
+
+[tool.setuptools.dynamic]
+version = { attr = "watersheep.__version__" }

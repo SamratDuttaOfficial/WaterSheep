@@ -1,0 +1,65 @@
+# Python environments and caches
+/.venv/
+/venv/
+/env/
+/.python/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+/build/
+/dist/
+
+# Downloaded and generated data
+/data/
+/hf_cache/
+/kaggle_cache/
+/downloads/
+/ollama_bin/
+/state/
+/logs/
+/out/
+/.selftest/
+/tools/*.log
+
+# Models and checkpoints
+/checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.gguf
+*.onnx
+*.npz
+
+# Local settings
+/config.json
+.env
+
+# Paper (kept local, never committed)
+/paper/
+
+# LaTeX build output
+*.pdf
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local agent notes
+agent.md
+AGENT.md

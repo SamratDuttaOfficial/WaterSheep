@@ -1,0 +1,19 @@
+{
+  "state": {
+    "customer": "Priya Nair (premium plan)",
+    "message": "This is the THIRD time I'm writing. I was charged twice for order #4411 and the package still hasn't arrived after 12 days. Refund me today or I'm disputing it with my bank."
+  },
+  "questions": {
+    "escalate": {"type": "noul", "instructions": "Should this be escalated to a human agent right away?"},
+    "department": {"type": "choice", "instructions": "Which team should handle this?",
+                   "criteria": {"billing": "payments, double charges, refunds",
+                                "shipping": "delivery delays, lost or damaged packages",
+                                "technical": "bugs, login problems, app errors",
+                                "sales": "pricing, upgrades, new accounts"}},
+    "frustration": {"type": "score", "instructions": "How frustrated is the customer?",
+                    "criteria": ["calm", "mildly annoyed", "frustrated", "furious"]},
+    "issues": {"type": "multi", "instructions": "Which issues does the customer report?",
+               "criteria": {"double charge": "", "late delivery": "", "damaged item": "",
+                            "wrong item": "", "cannot log in": ""}}
+  }
+}

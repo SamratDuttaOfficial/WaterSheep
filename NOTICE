@@ -1,0 +1,141 @@
+WaterSheep
+Copyright 2026 Samrat Dutta <samratduttaofficial@gmail.com>
+
+The WaterSheep code and model weights are licensed under the Apache License,
+Version 2.0 (see LICENSE).
+
+-------------------------------------------------------------------------------
+Base model
+-------------------------------------------------------------------------------
+The WaterSheep model is fine-tuned from ModernBERT-base by Answer.AI and
+LightOn (https://huggingface.co/answerdotai/ModernBERT-base), licensed under
+the Apache License, Version 2.0. The encoder weights were modified by
+fine-tuning, and a decision head was added.
+
+-------------------------------------------------------------------------------
+Synthetic training data
+-------------------------------------------------------------------------------
+Synthetic training examples, label descriptions and soft labels were produced
+with Qwen3.5-4B by the Qwen team, Alibaba Cloud
+(https://huggingface.co/Qwen/Qwen3.5-4B), licensed under the Apache License,
+Version 2.0.
+
+-------------------------------------------------------------------------------
+Public training data
+-------------------------------------------------------------------------------
+The model was also trained on the public datasets below. The datasets are not
+included in this repository or in the model files; the code downloads them
+from their sources. Each dataset remains under its own license, as stated by
+its source, and the Apache License of this project does not replace it.
+
+Hugging Face (https://huggingface.co/datasets/<name>)
+  allenai/ai2_arc                                                  CC BY-SA 4.0
+  allenai/openbookqa                                               Apache 2.0
+  allenai/prosocial-dialog                                         CC BY 4.0
+  allenai/quartz                                                   CC BY 4.0
+  allenai/reward-bench                                             ODC-By 1.0
+  allenai/scitail                                                  Apache 2.0
+  allenai/winogrande                                               CC BY
+  Anthropic/hh-rlhf                                                MIT
+  aps/super_glue (COPA)                                            BSD 2-Clause
+  aps/super_glue (WSC)                                             CC BY 4.0
+  benayas/snips                                                    Apache 2.0
+  bitext/Bitext-customer-support-llm-chatbot-training-dataset      CDLA-Sharing 1.0
+  cais/mmlu                                                        MIT
+  chengxuphd/liar2                                                 Apache 2.0
+  clinc/clinc_oos                                                  CC BY 3.0
+  coastalcph/lex_glue                                              CC BY 4.0
+  deepset/prompt-injections                                        Apache 2.0
+  demelin/moral_stories                                            MIT
+  Deysi/spam-detection-dataset                                     Apache 2.0
+  fancyzhx/dbpedia_14                                              CC BY-SA 3.0
+  GBaker/MedQA-USMLE-4-options                                     CC BY 4.0
+  gfissore/arxiv-abstracts-2021                                    CC0 1.0
+  glaiveai/glaive-function-calling-v2                              Apache 2.0
+  gonglinyuan/CoSQA                                                MIT
+  google-research-datasets/go_emotions                             Apache 2.0
+  google-research-datasets/paws                                    Free for any purpose
+  google-research-datasets/poem_sentiment                          CC BY 4.0
+  google/boolq                                                     CC BY-SA 3.0
+  google/civil_comments                                            CC0 1.0
+  gretelai/symptom_to_diagnosis                                    Apache 2.0
+  hendrycks/ethics                                                 MIT
+  HuggingFaceH4/ultrafeedback_binarized                            MIT
+  Intel/orca_dpo_pairs                                             Apache 2.0
+  jackhhao/jailbreak-classification                                Apache 2.0
+  jakartaresearch/semeval-absa                                     CC BY 4.0
+  lmsys/mt_bench_human_judgments                                   CC BY 4.0
+  marksverdhei/clickbait_title_classification                      MIT
+  mikex86/stackoverflow-posts                                      CC BY-SA
+  mmathys/openai-moderation-api-evaluation                         MIT
+  mteb/amazon_counterfactual                                       CC BY 4.0
+  mteb/banking77                                                   MIT
+  mteb/toxic_conversations_50k                                     CC BY 4.0
+  nvidia/Aegis-AI-Content-Safety-Dataset-2.0                       CC BY 4.0
+  nvidia/HelpSteer                                                 CC BY 4.0
+  nvidia/HelpSteer2                                                CC BY 4.0
+  nyu-mll/glue (QNLI)                                              CC BY-SA 4.0
+  nyu-mll/multi_nli                                                OANC / CC BY-SA 3.0 / CC BY 3.0
+  openlifescienceai/medmcqa                                        Apache 2.0
+  owaiskha9654/PubMed_MultiLabel_Text_Classification_Dataset_MeSH  AFL 3.0
+  pminervini/HaluEval                                              Apache 2.0
+  prometheus-eval/Feedback-Collection                              CC BY 4.0
+  prometheus-eval/Preference-Collection                            CC BY 4.0
+  qiaojin/PubMedQA                                                 MIT
+  rajpurkar/squad_v2                                               CC BY-SA 4.0
+  reshabhs/SPML_Chatbot_Prompt_Injection                           MIT
+  SetFit/amazon_massive_intent_en-US                               CC BY 4.0
+  SetFit/amazon_massive_scenario_en-US                             CC BY 4.0
+  SetFit/student-question-categories                               CC0 1.0
+  stanfordnlp/snli                                                 CC BY-SA 4.0
+  tals/vitaminc                                                    CC BY-SA 3.0
+  tasksource/bigbench                                              Apache 2.0
+  tasksource/crowdflower (political media subsets)                 CC0 1.0
+  tasksource/esci                                                  Apache 2.0
+  tasksource/folio                                                 CC BY-SA 4.0
+  tau/commonsense_qa                                               MIT
+  tdavidson/hate_speech_offensive                                  MIT
+  thesofakillers/jigsaw-toxic-comment-classification-challenge     CC BY-SA 3.0
+  TIGER-Lab/MMLU-Pro                                               MIT
+  TimSchopf/medical_abstracts                                      CC BY-SA 3.0
+  truthfulqa/truthful_qa                                           Apache 2.0
+  ucirvine/sms_spam                                                CC BY 4.0
+  zeroshot/twitter-financial-news-sentiment                        MIT
+  zeroshot/twitter-financial-news-topic                            MIT
+
+Kaggle (https://www.kaggle.com/datasets/<name>)
+  andrewmvd/cyberbullying-classification                 CC BY 4.0
+  imoore/60k-stack-overflow-questions-with-quality-rate  MIT / CC BY-SA
+  jp797498e/twitter-entity-sentiment-analysis            CC0 1.0
+  nicapotato/womens-ecommerce-clothing-reviews           CC0 1.0
+  rmisra/clothing-fit-dataset-for-size-recommendation    CC BY 4.0
+  rounakbanik/the-movies-dataset                         CC0 1.0
+  saurabhshahane/ecommerce-text-classification           CC BY 4.0
+  shivamb/real-or-fake-fake-jobposting-prediction        CC0 1.0
+  snap/amazon-fine-food-reviews                          CC0 1.0
+  snehaanbhawal/resume-dataset                           CC0 1.0
+  subhajournal/phishingemails                            LGPL 3.0
+  tboyle10/medicaltranscriptions                         CC0 1.0
+
+Other sources
+  NLU Evaluation Data (HWU64)  CC BY 4.0
+    https://github.com/xliuhw/NLU-Evaluation-Data
+  UCI News Aggregator          CC BY 4.0
+    https://archive.ics.uci.edu/dataset/359/news+aggregator
+  UCI YouTube Spam Collection  CC BY 4.0
+    https://archive.ics.uci.edu/dataset/380/youtube+spam+collection
+
+-------------------------------------------------------------------------------
+Held-out data
+-------------------------------------------------------------------------------
+The pipeline also downloads these datasets but withholds them from training;
+they are used only to test the model on data it has not seen.
+
+  allenai/qasc                                         CC BY 4.0
+    https://huggingface.co/datasets/allenai/qasc
+  PromptCloudHQ/amazon-reviews-unlocked-mobile-phones  CC0 1.0
+    https://www.kaggle.com/datasets/PromptCloudHQ/amazon-reviews-unlocked-mobile-phones
+  rmisra/news-category-dataset                         CC BY 4.0
+    https://www.kaggle.com/datasets/rmisra/news-category-dataset
+  rmisra/news-headlines-dataset-for-sarcasm-detection  CC BY 4.0
+    https://www.kaggle.com/datasets/rmisra/news-headlines-dataset-for-sarcasm-detection

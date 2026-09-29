@@ -1,0 +1,12 @@
+# The env stage installs anything missing automatically (into the project .venv).
+# torch goes first, from the CUDA wheel index:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+torch>=2.4
+numpy>=1.24
+transformers>=4.48          # ModernBERT
+datasets>=3.0
+pandas>=2.0
+pyarrow>=15
+safetensors>=0.4
+matplotlib>=3.8
+kagglehub>=0.3              # optional: Kaggle sources (public datasets need no login)
