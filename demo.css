@@ -35,11 +35,11 @@
 .ws-progress { flex: 1 1 100%; height: 6px; background: var(--ws-surface); border-radius: 99px; overflow: hidden; }
 .ws-progress-bar { height: 100%; width: 0; background: var(--ws-accent); transition: width .2s; }
 
-.ws-panel[data-panel="one"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.ws-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
 .ws-panel[hidden] { display: none; }
-@media (max-width: 760px) { .ws-panel[data-panel="one"] { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .ws-panel { grid-template-columns: 1fr; } }
 .ws-form { display: flex; flex-direction: column; gap: 12px; }
-.ws-form > label, .ws-json label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 14px; }
+.ws-form > label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 14px; }
 .ws-demo textarea, .ws-demo input[name="question"] {
   font: inherit; font-weight: 400; color: var(--ws-text); background: var(--ws-field); border: 1px solid var(--ws-line);
   border-radius: 8px; padding: 9px 11px; width: 100%; resize: vertical;
@@ -80,13 +80,10 @@
 .ws-result details { margin-top: 14px; font-size: 13px; }
 .ws-result summary { cursor: pointer; color: var(--ws-muted); }
 .ws-demo pre {
-  background: var(--ws-field); border: 1px solid var(--ws-line); border-radius: 8px; padding: 10px 12px; overflow: auto;
-  font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; max-height: 420px; margin: 8px 0 0;
-  white-space: pre-wrap; overflow-wrap: anywhere;
+  background: var(--ws-field); color: var(--ws-text); border: 1px solid var(--ws-line); border-radius: 8px;
+  padding: 10px 12px; overflow: auto; font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  max-height: 420px; margin: 8px 0 0; white-space: pre-wrap; overflow-wrap: anywhere;
 }
-.ws-hint { color: var(--ws-muted); margin: 0 0 12px; font-size: 14px; }
-.ws-json { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
-@media (max-width: 760px) { .ws-json { grid-template-columns: 1fr; } }
-.ws-json textarea { font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.ws-ask { width: 100%; }
-.ws-response { min-height: 120px; }
+.ws-response pre { margin: 0; max-height: 440px; }
+.ws-hint { color: var(--ws-muted); margin: 0; font-size: 14px; }
+.ws-demo .ws-request { font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }

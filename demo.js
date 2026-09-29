@@ -71,11 +71,14 @@ function mount(root) {
       </div>
     </div>
     <div class="ws-panel" data-panel="json" hidden>
-      <p class="ws-hint">Several questions on one context. Types: <code>noul</code>, <code>choice</code>,
-        <code>score</code>, <code>multi</code>.</p>
-      <div class="ws-json">
-        <label>Request<textarea class="ws-request" rows="20" spellcheck="false"></textarea></label>
-        <div><button type="button" class="ws-go ws-ask">Run</button><pre class="ws-response" aria-live="polite"></pre></div>
+      <div class="ws-form">
+        <p class="ws-hint">Several questions on one context. Types: <code>noul</code>, <code>choice</code>,
+          <code>score</code>, <code>multi</code>.</p>
+        <label>Request<textarea class="ws-request" rows="18" spellcheck="false"></textarea></label>
+        <button type="button" class="ws-go ws-ask">Run</button>
+      </div>
+      <div class="ws-result ws-response" aria-live="polite">
+        <p class="ws-empty">Results appear here.</p>
       </div>
     </div>`;
 
@@ -183,19 +186,19 @@ function mount(root) {
       req = JSON.parse($(".ws-request").value);
       if (!req || typeof req !== "object" || !req.questions || typeof req.questions !== "object") throw new Error('expected {"state": ..., "questions": {...}}');
     } catch (e) {
-      out.textContent = `Error: ${e.message}`;
+      out.innerHTML = html`<p class="ws-error">Error: ${e.message}</p>`;
       return;
     }
     btn.disabled = true;
-    out.textContent = "Running…";
+    out.innerHTML = '<p class="ws-empty">Running…</p>';
     try {
       await ensure();
       const t0 = performance.now();
       const res = await ask(req);
       res.usage.ms = Math.round(performance.now() - t0);
-      out.textContent = JSON.stringify(res, null, 2);
+      out.innerHTML = html`<pre>${JSON.stringify(res, null, 2)}</pre>`;
     } catch (e) {
-      out.textContent = `Error: ${e.message}`;
+      out.innerHTML = html`<p class="ws-error">Error: ${e.message}</p>`;
     } finally {
       btn.disabled = false;
     }
