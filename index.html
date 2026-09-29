@@ -75,6 +75,16 @@
   .steps h3 { font-size: 16px; margin: 22px 0 8px; }
   .s { color: #a7f3d0; } .k { color: #f9a8d4; } .c { color: #7dd3fc; }
 
+  .table { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin: 0 0 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; background: var(--accent-soft); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td:first-child { white-space: normal; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  section h3.minor { font-size: 18px; margin: 32px 0 12px; }
+  .cols { display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .cols h2 { margin-bottom: 14px; }
   ul.points { padding-left: 20px; margin: 0; }
   ul.points li { margin: 8px 0; }
   footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
@@ -95,6 +105,7 @@
       <a href="#demo">Demo</a>
       <a href="#capabilities">Capabilities</a>
       <a href="#start">Get started</a>
+      <a href="#evaluation">Evaluation</a>
       <a class="gh" href="https://github.com/SamratDuttaOfficial/WaterSheep">GitHub</a>
     </nav>
   </div>
@@ -128,10 +139,23 @@
       <p class="sub">Options are defined per request, so one model covers routing, triage, moderation, scoring and tagging.</p>
       <div class="grid">
         <div class="card"><span class="kind">noul</span><h3>Yes / No</h3><p>Probability of yes.</p></div>
-        <div class="card"><span class="kind">choice</span><h3>Single choice</h3><p>Best option, with a probability for each.</p></div>
-        <div class="card"><span class="kind">score</span><h3>Rating</h3><p>Expected level on a scale.</p></div>
-        <div class="card"><span class="kind">multi</span><h3>Multi-label</h3><p>Every applicable option, each with its own probability.</p></div>
+        <div class="card"><span class="kind">choice</span><h3>Single choice</h3><p>The option, with a probability for each.</p></div>
+        <div class="card"><span class="kind">score</span><h3>Rating</h3><p>The expected level, with a probability for each.</p></div>
+        <div class="card"><span class="kind">multi</span><h3>Multi-label</h3><p>Every option above the threshold, with probabilities.</p></div>
       </div>
+    </div>
+  </section>
+
+  <section id="design">
+    <div class="wrap">
+      <h2>Design</h2>
+      <ul class="points">
+        <li><strong>Structured.</strong> Typed answers, no text to parse.</li>
+        <li><strong>Calibrated.</strong> Probabilities you can use as confidence scores.</li>
+        <li><strong>Open.</strong> Code and weights under Apache 2.0, trained on openly licensed data.
+          See <a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE">NOTICE</a>.</li>
+        <li><strong>Portable.</strong> Transformers, JavaScript and ONNX.</li>
+      </ul>
     </div>
   </section>
 
@@ -146,6 +170,25 @@
 ws = pipeline(model=<span class="s">"samratduttaofficial/WaterSheep"</span>, trust_remote_code=<span class="k">True</span>)
 ws(<span class="s">"I was charged twice."</span>, question=<span class="s">"Which team should handle this?"</span>,
    options=[<span class="s">"billing"</span>, <span class="s">"shipping"</span>, <span class="s">"support"</span>])</pre>
+      <h3>Several questions at once</h3>
+      <p>With the Python package, <code>decide</code> returns the answer, its confidence and a probability for every option. <code>ask</code> answers several questions about one text:</p>
+<pre>pip install git+https://github.com/SamratDuttaOfficial/WaterSheep</pre>
+<pre><span class="k">from</span> watersheep <span class="k">import</span> WaterSheep
+
+ws = WaterSheep.load(<span class="s">"samratduttaofficial/WaterSheep"</span>)
+ws.ask({
+    <span class="s">"state"</span>: {<span class="s">"customer"</span>: <span class="s">"Priya (premium plan)"</span>,
+              <span class="s">"message"</span>: <span class="s">"Charged twice for order #4411 and the package is 12 days late."</span>},
+    <span class="s">"questions"</span>: {
+        <span class="s">"escalate"</span>: {<span class="s">"type"</span>: <span class="s">"noul"</span>, <span class="s">"instructions"</span>: <span class="s">"Should a human agent take over now?"</span>},
+        <span class="s">"team"</span>: {<span class="s">"type"</span>: <span class="s">"choice"</span>, <span class="s">"instructions"</span>: <span class="s">"Which team should handle this?"</span>,
+                 <span class="s">"criteria"</span>: {<span class="s">"billing"</span>: <span class="s">"payments, refunds"</span>, <span class="s">"shipping"</span>: <span class="s">"delivery problems"</span>}},
+        <span class="s">"frustration"</span>: {<span class="s">"type"</span>: <span class="s">"score"</span>, <span class="s">"instructions"</span>: <span class="s">"How frustrated is the customer?"</span>,
+                        <span class="s">"criteria"</span>: [<span class="s">"calm"</span>, <span class="s">"annoyed"</span>, <span class="s">"frustrated"</span>, <span class="s">"furious"</span>]},
+        <span class="s">"issues"</span>: {<span class="s">"type"</span>: <span class="s">"multi"</span>, <span class="s">"instructions"</span>: <span class="s">"Which issues are reported?"</span>,
+                   <span class="s">"criteria"</span>: [<span class="s">"double charge"</span>, <span class="s">"late delivery"</span>, <span class="s">"damaged item"</span>]},
+    },
+})</pre>
       <h3>Download</h3>
 <pre>hf download samratduttaofficial/WaterSheep --local-dir WaterSheep</pre>
       <p>Or with Git (requires <a href="https://git-lfs.com">Git LFS</a>):</p>
@@ -164,16 +207,39 @@ ws(<span class="s">"I was charged twice."</span>, question=<span class="s">"Whic
     </div>
   </section>
 
-  <section id="design">
+  <section id="evaluation">
     <div class="wrap">
-      <h2>Design</h2>
-      <ul class="points">
-        <li><strong>Structured.</strong> Typed answers, no text to parse.</li>
-        <li><strong>Calibrated.</strong> Probabilities you can use as confidence scores.</li>
-        <li><strong>Open.</strong> Code and weights under Apache 2.0, trained on openly licensed data.
-          See <a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE">NOTICE</a>.</li>
-        <li><strong>Portable.</strong> Transformers, JavaScript and ONNX.</li>
-      </ul>
+      <h2>Evaluation</h2>
+      <p class="sub">ECE is the expected calibration error (lower is better).</p>
+      <div class="table"><table><thead><tr><th>Evaluation</th><th class="num">Accuracy</th><th class="num">ECE</th></tr></thead><tbody><tr><td>In-distribution test split</td><td class="num">77.8%</td><td class="num">0.026</td></tr><tr><td>Held-out datasets, not seen in training</td><td class="num">61.2%</td><td class="num">0.043</td></tr></tbody></table></div>
+      <h3 class="minor">Benchmarks</h3>
+      <div class="table"><table><thead><tr><th>Benchmark</th><th>Suite</th><th class="num">Questions</th><th class="num">Accuracy</th><th class="num">ECE</th><th>In training data</th></tr></thead><tbody><tr><td><a href="https://huggingface.co/datasets/google-research-datasets/go_emotions">goemotions</a></td><td>sentiment</td><td class="num">2,000</td><td class="num">22.4%</td><td class="num">0.023</td><td>other split</td></tr><tr><td><a href="https://huggingface.co/datasets/Paul/hatecheck">hatecheck</a></td><td>safety</td><td class="num">2,000</td><td class="num">75.1%</td><td class="num">0.139</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_abercrombie</a></td><td>legal</td><td class="num">95</td><td class="num">21.1%</td><td class="num">0.316</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_contract_nli_confidentiality_of_agreement</a></td><td>legal</td><td class="num">82</td><td class="num">69.5%</td><td class="num">0.177</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_corporate_lobbying</a></td><td>legal</td><td class="num">490</td><td class="num">68.4%</td><td class="num">0.216</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_cuad_audit_rights</a></td><td>legal</td><td class="num">1,216</td><td class="num">86.3%</td><td class="num">0.041</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_definition_classification</a></td><td>legal</td><td class="num">1,337</td><td class="num">56.9%</td><td class="num">0.279</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_function_of_decision_section</a></td><td>legal</td><td class="num">367</td><td class="num">24.3%</td><td class="num">0.245</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_hearsay</a></td><td>legal</td><td class="num">94</td><td class="num">56.4%</td><td class="num">0.307</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_overruling</a></td><td>legal</td><td class="num">2,000</td><td class="num">62.5%</td><td class="num">0.151</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_personal_jurisdiction</a></td><td>legal</td><td class="num">50</td><td class="num">50.0%</td><td class="num">0.160</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_privacy_policy_qa</a></td><td>legal</td><td class="num">2,000</td><td class="num">58.9%</td><td class="num">0.274</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_proa</a></td><td>legal</td><td class="num">95</td><td class="num">51.6%</td><td class="num">0.379</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_ucc_v_common_law</a></td><td>legal</td><td class="num">94</td><td class="num">62.8%</td><td class="num">0.171</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/deepset/prompt-injections">prompt_injection</a></td><td>safety</td><td class="num">116</td><td class="num">91.4%</td><td class="num">0.079</td><td>other split</td></tr><tr><td><a href="https://huggingface.co/datasets/Paul/XSTest">xstest</a></td><td>safety</td><td class="num">450</td><td class="num">73.6%</td><td class="num">0.140</td><td>no</td></tr></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="training">
+    <div class="wrap cols">
+      <div>
+        <h2>Training</h2>
+        <ul class="points"><li>Base model: <a href="https://huggingface.co/answerdotai/ModernBERT-base">answerdotai/ModernBERT-base</a>, fine-tuned with a decision head.</li><li>Data: openly licensed public datasets (listed in <a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE">NOTICE</a>) and synthetic decisions from Qwen3.5-4B.</li><li>Calibration: a temperature per question type, fitted on a validation split.</li></ul>
+      </div>
+      <div>
+        <h2>Limitations</h2>
+        <ul class="points"><li>English only.</li><li>Long inputs are truncated.</li><li>Rating-scale answers are less accurate than the other types.</li><li>Probabilities are calibrated on data like the training data; validate them on your own.</li><li>Not for high-stakes decisions (medical, legal, financial, hiring) on its own.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="cite">
+    <div class="wrap">
+      <h2>License and citation</h2>
+      <p class="sub">Apache 2.0 (<a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/LICENSE">LICENSE</a>). Attributions: <a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE">NOTICE</a>.</p>
+<pre>@misc{watersheep,
+  author = {Samrat Dutta},
+  title  = {WaterSheep: calibrated decisions for any text},
+  year   = {2026},
+  url    = {https://huggingface.co/samratduttaofficial/WaterSheep}
+}</pre>
     </div>
   </section>
 </main>
