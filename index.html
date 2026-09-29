@@ -139,31 +139,28 @@
     <div class="wrap steps">
       <h2>Get started</h2>
       <p class="sub">The model downloads from Hugging Face on first use, then runs locally.</p>
-      <h3>Install</h3>
-<pre>pip install git+https://github.com/SamratDuttaOfficial/WaterSheep</pre>
       <h3>Python</h3>
-<pre><span class="k">from</span> watersheep <span class="k">import</span> WaterSheep
+<pre>pip install transformers torch</pre>
+<pre><span class="k">from</span> transformers <span class="k">import</span> pipeline
 
-ws = WaterSheep.load(<span class="s">"samratduttaofficial/WaterSheep"</span>)
-ws.decide(<span class="s">"I was charged twice."</span>, <span class="s">"Which team should handle this?"</span>,
-          [<span class="s">"billing"</span>, <span class="s">"shipping"</span>, <span class="s">"support"</span>])</pre>
-      <h3>Command line and HTTP API</h3>
-<pre>watersheep --model samratduttaofficial/WaterSheep --question <span class="s">"Which team should handle this?"</span> --options billing,shipping,support --state <span class="s">"I was charged twice."</span>
-watersheep --model samratduttaofficial/WaterSheep --serve</pre>
-      <p><code>--serve</code> exposes <code>POST http://127.0.0.1:8766/v1/decisions</code>.</p>
+ws = pipeline(model=<span class="s">"samratduttaofficial/WaterSheep"</span>, trust_remote_code=<span class="k">True</span>)
+ws(<span class="s">"I was charged twice."</span>, question=<span class="s">"Which team should handle this?"</span>,
+   options=[<span class="s">"billing"</span>, <span class="s">"shipping"</span>, <span class="s">"support"</span>])</pre>
+      <h3>Download</h3>
+<pre>hf download samratduttaofficial/WaterSheep --local-dir WaterSheep</pre>
+      <p>Or with Git (requires <a href="https://git-lfs.com">Git LFS</a>):</p>
+<pre>git clone https://huggingface.co/samratduttaofficial/WaterSheep</pre>
+      <p>Then load it from the folder, offline:</p>
+<pre>ws = pipeline(model=<span class="s">"WaterSheep"</span>, trust_remote_code=<span class="k">True</span>)</pre>
+      <h3>API</h3>
+      <p>Deploy it as a Hugging Face <a href="https://endpoints.huggingface.co">Inference Endpoint</a>, then:</p>
+<pre>curl https://YOUR-ENDPOINT -H <span class="s">"Authorization: Bearer $HF_TOKEN"</span> -H <span class="s">"Content-Type: application/json"</span> -d <span class="s">'{"inputs": "I was charged twice.", "parameters": {"question": "Which team should handle this?", "options": ["billing", "shipping", "support"]}}'</span></pre>
       <h3>JavaScript</h3>
 <pre>&lt;script type="module"&gt;
   <span class="k">import</span> { decide } <span class="k">from</span> <span class="s">"https://samratduttaofficial.github.io/WaterSheep/watersheep.js"</span>;
   console.log(<span class="k">await</span> decide(<span class="s">"I was charged twice."</span>, <span class="s">"Which team should handle this?"</span>, [<span class="s">"billing"</span>, <span class="s">"shipping"</span>, <span class="s">"support"</span>]));
 &lt;/script&gt;</pre>
-      <h3>Download and run locally</h3>
-<pre>hf download samratduttaofficial/WaterSheep --local-dir WaterSheep</pre>
-      <p>Or <code>git clone https://huggingface.co/samratduttaofficial/WaterSheep</code> (requires Git LFS).
-        Then use the <code>WaterSheep</code> folder in place of the model id:</p>
-<pre>ws = WaterSheep.load(<span class="s">"WaterSheep"</span>)
-watersheep --model WaterSheep --serve</pre>
-      <p>JavaScript: <code>load({ base: "WaterSheep/" })</code>. Other languages: run
-        <code>WaterSheep/onnx/model_quantized.onnx</code> with ONNX Runtime.</p>
+      <p>No install. With a downloaded copy on your web server, call <code>load({ base: "WaterSheep/" })</code> first.</p>
     </div>
   </section>
 
@@ -171,11 +168,11 @@ watersheep --model WaterSheep --serve</pre>
     <div class="wrap">
       <h2>Design</h2>
       <ul class="points">
-        <li><strong>Single pass.</strong> Context, question and options are scored jointly. No generation, no parsing.</li>
-        <li><strong>Calibrated.</strong> Probabilities are calibrated per question type and usable as confidence scores.</li>
+        <li><strong>Structured.</strong> Typed answers, no text to parse.</li>
+        <li><strong>Calibrated.</strong> Probabilities you can use as confidence scores.</li>
         <li><strong>Open.</strong> Code and weights under Apache 2.0, trained on openly licensed data.
           See <a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE">NOTICE</a>.</li>
-        <li><strong>Portable.</strong> Python API, REST endpoint and ONNX.</li>
+        <li><strong>Portable.</strong> Transformers, JavaScript and ONNX.</li>
       </ul>
     </div>
   </section>
