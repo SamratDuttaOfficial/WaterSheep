@@ -1,0 +1,122 @@
+\begin{longtable}{@{}l>{\raggedright\arraybackslash}p{6.4cm}crl@{}}
+\caption{All 109 public datasets. Name is the identifier in our code; the origin is the Hugging Face dataset, the Kaggle dataset, or the host of a direct download. Type: B binary, C choice, S score, M multi. $^\dagger$ withheld from training.}\label{tab:sources}\\
+\toprule
+Name & Origin & Type & Records & Category \\
+\midrule
+\endfirsthead
+\toprule
+Name & Origin & Type & Records & Category \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+banking77 & \path{mteb/banking77} & C & 5,000 & Agents and support \\
+clinc & \path{clinc/clinc_oos} & C & 5,000 & Agents and support \\
+counterfactual & \path{mteb/amazon_counterfactual} & B & 4,018 & Agents and support \\
+massive\_intent & \path{SetFit/amazon_massive_intent_en-US} & C & 5,000 & Agents and support \\
+massive\_scenario & \path{SetFit/amazon_massive_scenario_en-US} & C & 5,000 & Agents and support \\
+snips & \path{benayas/snips} & C & 5,000 & Agents and support \\
+support\_intent & \path{bitext/Bitext-customer-support-llm-chatbot-training-dataset} & C & 5,000 & Agents and support \\
+support\_routing & \path{bitext/Bitext-customer-support-llm-chatbot-training-dataset} & C & 5,000 & Agents and support \\
+tool\_choice & \path{glaiveai/glaive-function-calling-v2} & C & 5,000 & Agents and support \\
+hwu64 & \path{raw.githubusercontent.com} & C & 5,000 & Agents and support \\
+ethics\_commonsense & \path{hendrycks/ethics} & B & 5,000 & Ethics \\
+ethics\_deontology & \path{hendrycks/ethics} & B & 5,000 & Ethics \\
+ethics\_justice & \path{hendrycks/ethics} & B & 5,000 & Ethics \\
+ethics\_utility & \path{hendrycks/ethics} & C & 5,000 & Ethics \\
+ethics\_virtue & \path{hendrycks/ethics} & B & 5,000 & Ethics \\
+moral\_stories & \path{demelin/moral_stories} & C & 5,000 & Ethics \\
+boolq & \path{google/boolq} & B & 5,000 & Grounding \\
+cosqa & \path{gonglinyuan/CoSQA} & B & 5,000 & Grounding \\
+esci & \path{tasksource/esci} & C & 5,000 & Grounding \\
+halueval & \path{pminervini/HaluEval} & B & 5,000 & Grounding \\
+liar2 & \path{chengxuphd/liar2} & C & 5,000 & Grounding \\
+pubmedqa & \path{qiaojin/PubMedQA} & B & 5,000 & Grounding \\
+qnli & \path{nyu-mll/glue} & B & 5,000 & Grounding \\
+squad\_v2 & \path{rajpurkar/squad_v2} & B & 5,000 & Grounding \\
+vitaminc & \path{tals/vitaminc} & C & 5,000 & Grounding \\
+helpsteer & \path{nvidia/HelpSteer2} & S & 5,000 & Judging \\
+helpsteer1 & \path{nvidia/HelpSteer} & S & 5,000 & Judging \\
+hh\_rlhf & \path{Anthropic/hh-rlhf} & C & 5,000 & Judging \\
+mt\_bench\_human & \path{lmsys/mt_bench_human_judgments} & C & 1,274 & Judging \\
+orca\_pairs & \path{Intel/orca_dpo_pairs} & C & 5,000 & Judging \\
+preference & \path{HuggingFaceH4/ultrafeedback_binarized} & C & 5,000 & Judging \\
+preference\_rubric & \path{prometheus-eval/Preference-Collection} & C & 5,000 & Judging \\
+reward\_bench & \path{allenai/reward-bench} & C & 2,985 & Judging \\
+rubric\_score & \path{prometheus-eval/Feedback-Collection} & S & 5,000 & Judging \\
+case\_hold & \path{coastalcph/lex_glue} & C & 5,000 & Domain \\
+echr\_alleged & \path{coastalcph/lex_glue} & M & 3,000 & Domain \\
+echr\_violations & \path{coastalcph/lex_glue} & M & 3,000 & Domain \\
+fin\_sentiment & \path{zeroshot/twitter-financial-news-sentiment} & C & 5,000 & Domain \\
+fin\_topics & \path{zeroshot/twitter-financial-news-topic} & C & 5,000 & Domain \\
+ledgar & \path{coastalcph/lex_glue} & C & 5,000 & Domain \\
+medical\_abstracts & \path{TimSchopf/medical_abstracts} & C & 5,000 & Domain \\
+pubmed\_topics & \path{owaiskha9654/PubMed_MultiLabel_Text_Classification_Dataset_MeSH} & M & 5,000 & Domain \\
+symptom\_diagnosis & \path{gretelai/symptom_to_diagnosis} & C & 853 & Domain \\
+unfair\_tos & \path{coastalcph/lex_glue} & B & 5,000 & Domain \\
+unfair\_tos\_types & \path{coastalcph/lex_glue} & M & 5,000 & Domain \\
+medical\_specialty & \path{tboyle10/medicaltranscriptions} & C & 4,999 & Domain \\
+arc\_challenge & \path{allenai/ai2_arc} & C & 1,116 & Reasoning \\
+arc\_easy & \path{allenai/ai2_arc} & C & 2,251 & Reasoning \\
+bigbench & \path{tasksource/bigbench} & C & 15,000 & Reasoning \\
+commonsense\_qa & \path{tau/commonsense_qa} & C & 5,000 & Reasoning \\
+copa & \path{aps/super_glue} & C & 400 & Reasoning \\
+folio & \path{tasksource/folio} & C & 1,001 & Reasoning \\
+medmcqa & \path{openlifescienceai/medmcqa} & C & 5,000 & Reasoning \\
+medqa & \path{GBaker/MedQA-USMLE-4-options} & C & 5,000 & Reasoning \\
+mmlu & \path{cais/mmlu} & C & 5,000 & Reasoning \\
+mmlu\_pro & \path{TIGER-Lab/MMLU-Pro} & C & 5,000 & Reasoning \\
+mnli & \path{nyu-mll/multi_nli} & C & 5,000 & Reasoning \\
+openbookqa & \path{allenai/openbookqa} & C & 4,942 & Reasoning \\
+paws & \path{google-research-datasets/paws} & B & 5,000 & Reasoning \\
+qasc$^\dagger$ & \path{allenai/qasc} & C & 5,000 & Reasoning \\
+quartz & \path{allenai/quartz} & C & 2,696 & Reasoning \\
+scitail & \path{allenai/scitail} & B & 5,000 & Reasoning \\
+snli & \path{stanfordnlp/snli} & C & 5,000 & Reasoning \\
+truthfulqa & \path{truthfulqa/truthful_qa} & C & 817 & Reasoning \\
+winogrande & \path{allenai/winogrande} & C & 5,000 & Reasoning \\
+wsc & \path{aps/super_glue} & B & 554 & Reasoning \\
+aegis\_categories & \path{nvidia/Aegis-AI-Content-Safety-Dataset-2.0} & M & 5,000 & Safety \\
+aegis\_safety & \path{nvidia/Aegis-AI-Content-Safety-Dataset-2.0} & B & 5,000 & Safety \\
+civil\_attributes & \path{google/civil_comments} & M & 3,000 & Safety \\
+civil\_comments & \path{google/civil_comments} & B & 5,000 & Safety \\
+clickbait & \path{marksverdhei/clickbait_title_classification} & B & 5,000 & Safety \\
+hate\_offensive & \path{tdavidson/hate_speech_offensive} & C & 5,000 & Safety \\
+jailbreak & \path{jackhhao/jailbreak-classification} & B & 1,044 & Safety \\
+jigsaw\_toxic\_types & \path{thesofakillers/jigsaw-toxic-comment-classification-challenge} & M & 5,000 & Safety \\
+moderation\_categories & \path{mmathys/openai-moderation-api-evaluation} & M & 755 & Safety \\
+prompt\_injection & \path{deepset/prompt-injections} & B & 546 & Safety \\
+prosocial & \path{allenai/prosocial-dialog} & C & 5,000 & Safety \\
+sms\_spam & \path{ucirvine/sms_spam} & B & 5,000 & Safety \\
+spam\_messages & \path{Deysi/spam-detection-dataset} & B & 5,000 & Safety \\
+spml\_injection & \path{reshabhs/SPML_Chatbot_Prompt_Injection} & B & 5,000 & Safety \\
+toxic\_conversations & \path{mteb/toxic_conversations_50k} & B & 5,000 & Safety \\
+cyberbullying & \path{andrewmvd/cyberbullying-classification} & C & 5,000 & Safety \\
+job\_fraud & \path{shivamb/real-or-fake-fake-jobposting-prediction} & B & 5,000 & Safety \\
+phishing & \path{subhajournal/phishingemails} & B & 5,000 & Safety \\
+youtube\_spam & \path{archive.ics.uci.edu} & B & 1,956 & Safety \\
+go\_emotions & \path{google-research-datasets/go_emotions} & C & 5,000 & Sentiment \\
+go\_emotions\_multi & \path{google-research-datasets/go_emotions} & M & 5,000 & Sentiment \\
+poem\_sentiment & \path{google-research-datasets/poem_sentiment} & C & 892 & Sentiment \\
+review\_aspects & \path{jakartaresearch/semeval-absa} & M & 472 & Sentiment \\
+clothing\_fit & \path{rmisra/clothing-fit-dataset-for-size-recommendation} & C & 5,000 & Sentiment \\
+clothing\_rating & \path{nicapotato/womens-ecommerce-clothing-reviews} & S & 5,000 & Sentiment \\
+clothing\_recommend & \path{nicapotato/womens-ecommerce-clothing-reviews} & B & 5,000 & Sentiment \\
+entity\_sentiment & \path{jp797498e/twitter-entity-sentiment-analysis} & C & 5,000 & Sentiment \\
+food\_reviews & \path{snap/amazon-fine-food-reviews} & S & 5,000 & Sentiment \\
+phone\_reviews$^\dagger$ & \path{PromptCloudHQ/amazon-reviews-unlocked-mobile-phones} & S & 5,000 & Sentiment \\
+sarcasm$^\dagger$ & \path{rmisra/news-headlines-dataset-for-sarcasm-detection} & B & 5,000 & Sentiment \\
+arxiv\_fields & \path{gfissore/arxiv-abstracts-2021} & M & 5,000 & Topic \\
+cf\_media\_audience & \path{tasksource/crowdflower} & C & 4,999 & Topic \\
+cf\_media\_bias & \path{tasksource/crowdflower} & B & 4,999 & Topic \\
+cf\_media\_message & \path{tasksource/crowdflower} & C & 4,878 & Topic \\
+dbpedia & \path{fancyzhx/dbpedia_14} & C & 5,000 & Topic \\
+stackoverflow\_tags & \path{mikex86/stackoverflow-posts} & M & 5,000 & Topic \\
+student\_questions & \path{SetFit/student-question-categories} & C & 5,000 & Topic \\
+ecommerce & \path{saurabhshahane/ecommerce-text-classification} & C & 5,000 & Topic \\
+movie\_genres & \path{rounakbanik/the-movies-dataset} & M & 5,000 & Topic \\
+news\_category$^\dagger$ & \path{rmisra/news-category-dataset} & C & 5,000 & Topic \\
+resume\_category & \path{snehaanbhawal/resume-dataset} & C & 2,483 & Topic \\
+so\_quality & \path{imoore/60k-stack-overflow-questions-with-quality-rate} & C & 5,000 & Topic \\
+news\_aggregator & \path{archive.ics.uci.edu} & C & 5,000 & Topic \\
+\end{longtable}

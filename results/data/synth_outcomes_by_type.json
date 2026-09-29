@@ -1,0 +1,26 @@
+{
+ "binary": {
+  "accepted": 10917,
+  "teacher_disagrees": 4676,
+  "low_quality": 904,
+  "structure": 245
+ },
+ "choice": {
+  "accepted": 11431,
+  "low_quality": 369,
+  "teacher_disagrees": 2842,
+  "structure": 181
+ },
+ "score": {
+  "low_quality": 1165,
+  "teacher_disagrees": 2712,
+  "accepted": 3451,
+  "structure": 137
+ },
+ "multi": {
+  "accepted": 4312,
+  "teacher_disagrees": 4374,
+  "structure": 393,
+  "low_quality": 91
+ }
+}

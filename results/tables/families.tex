@@ -1,0 +1,70 @@
+\begin{longtable}{@{}lc>{\raggedright\arraybackslash}p{8.4cm}rr@{}}
+\caption{The 57 synthetic decision families with the description given to the teacher, the number of generated examples and the acceptance rate. Type: B binary, C choice, S score, M multi.}\label{tab:families}\\
+\toprule
+Family & Type & Context and decision & Generated & Acceptance \\
+\midrule
+\endfirsthead
+\toprule
+Family & Type & Context and decision & Generated & Acceptance \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+escalation & B & a customer conversation; decide whether it must be escalated to a human agent now & 912 & 82\% \\
+policy violation & B & a short content policy followed by a user post; decide whether the post violates that policy & 938 & 68\% \\
+pii present & B & a piece of text (message, log line, form, email); decide whether it contains personal identifying information & 878 & 64\% \\
+prompt injection & B & a system instruction plus a user or tool input; decide whether the input tries to override the instructions & 913 & 59\% \\
+grounded answer & B & a reference passage, a question and an assistant answer; decide whether every claim in the answer is supported by the passage & 983 & 69\% \\
+task completed & B & a user request and an agent's action log; decide whether the agent fully completed the request & 917 & 70\% \\
+needs tool & B & an assistant's tool list and a user request; decide whether answering requires calling one of the tools & 960 & 48\% \\
+duplicate ticket & B & an existing support ticket and a new one; decide whether the new ticket describes the same issue & 981 & 68\% \\
+refund eligible & B & a refund policy with concrete rules and a customer case with dates and amounts; decide whether the customer is eligible & 935 & 69\% \\
+code bug & B & a short code snippet with its intended behaviour; decide whether it contains a bug that breaks that behaviour & 898 & 62\% \\
+email needs reply & B & an email received by a busy professional; decide whether it needs a reply from them & 956 & 69\% \\
+schedule conflict & B & a person's calendar for a day and a proposed meeting; decide whether the meeting conflicts with the calendar & 904 & 54\% \\
+fraud review & B & a payment transaction with account history; decide whether it should be flagged for fraud review & 981 & 81\% \\
+search relevance & B & a search query and one retrieved document; decide whether the document is relevant to the query & 904 & 67\% \\
+contradiction & B & two statements from different sources about the same subject; decide whether they contradict each other & 883 & 47\% \\
+summary faithful & B & a source text and a summary of it; decide whether the summary is faithful (no invented or wrong facts) & 924 & 70\% \\
+requirement met & B & a requirement from a spec and an implementation description; decide whether the requirement is met & 914 & 72\% \\
+safe to run & B & a shell command an AI agent proposes to run on a server, with the goal; decide whether it is safe to run without review & 961 & 55\% \\
+ticket routing & C & an incoming support message and the organisation's teams; choose the team that should handle it & 954 & 72\% \\
+tool selection & C & an agent's available tools with one-line descriptions and a user request; choose the single best tool to call next & 878 & 80\% \\
+next action & C & an agent's current state (goal, what happened so far, last observation); choose the best next action & 896 & 72\% \\
+intent & C & a user utterance to an app; choose the intent it expresses & 933 & 81\% \\
+document type & C & the first part of a document; choose what type of document it is & 945 & 83\% \\
+best answer & C & a user question and several candidate answers written in the options; choose the most correct and helpful answer & 903 & 75\% \\
+product match & C & a customer's needs and constraints; choose the product or plan that fits best & 939 & 66\% \\
+error category & C & an error message or log excerpt; choose the most likely root-cause category & 924 & 85\% \\
+complaint aspect & C & a customer review or complaint; choose the aspect the customer is unhappy about & 899 & 82\% \\
+moderation category & C & a user post; choose which moderation category applies (including 'no violation') & 937 & 73\% \\
+commit type & C & a code diff summary and commit message draft; choose the conventional commit type & 959 & 62\% \\
+missing information & C & a request that cannot be completed yet; choose which piece of information must be asked for first & 969 & 79\% \\
+workflow decision & C & a business document to process (invoice, expense, leave request, order); choose approve, reject, or another listed workflow outcome & 938 & 74\% \\
+entity type & C & a sentence with one entity in quotes; choose the entity's type & 924 & 84\% \\
+language register & C & a message; choose the tone or register it is written in & 897 & 87\% \\
+priority queue & C & a queue item with its context; choose which queue or lane it belongs to & 928 & 80\% \\
+urgency & S & a request or incident; rate how urgent it is & 954 & 49\% \\
+answer quality & S & a question and an assistant's answer; rate the answer's quality against a stated rubric & 972 & 36\% \\
+relevance grade & S & a query and a document; grade how relevant the document is & 934 & 45\% \\
+risk level & S & a proposed change or action with its context; rate the operational or compliance risk & 954 & 47\% \\
+lead quality & S & a sales lead with company and conversation details; rate how promising the lead is & 928 & 60\% \\
+sentiment intensity & S & a customer message; rate how strongly positive or negative it is & 912 & 55\% \\
+difficulty & S & a task or question; rate how difficult it is for a typical practitioner & 931 & 36\% \\
+confidence in claim & S & a claim with some supporting and opposing evidence; rate how well-supported the claim is & 880 & 42\% \\
+tools needed & M & an agent's available tools with one-line descriptions and a user request; select every tool the agent must call to complete it & 644 & 36\% \\
+policies violated & M & a short list of content or company policies and a user post or employee action; select every policy it violates & 743 & 34\% \\
+missing fields & M & a form, order or application with some fields filled in, and its requirements; select every required item that is missing or invalid & 703 & 53\% \\
+requirements met & M & a list of requirements and a candidate, product, plan or implementation; select every requirement that is satisfied & 718 & 49\% \\
+ticket tags & M & a support ticket or incident report; select every tag that applies to it & 703 & 41\% \\
+risk factors & M & a loan, claim, transaction, deployment or medical intake; select every listed risk factor that is present & 704 & 44\% \\
+teams to notify & M & an incident, request or change with its impact; select every team that must be notified or involved & 656 & 40\% \\
+document contains & M & a document excerpt (contract, email, report, record); select every kind of information it contains & 669 & 52\% \\
+topics discussed & M & a meeting note, call transcript or long message; select every topic that is actually discussed & 667 & 49\% \\
+actions required & M & an email, alert or case update; select every action the recipient needs to take & 688 & 39\% \\
+issues reported & M & a customer message, review or complaint; select every problem the customer reports, whether stated outright or clearly implied (e.g. 'still not here after 12 days' means a late delivery) & 458 & 48\% \\
+requests in message & M & a message that may bundle several requests; select every request the sender actually makes & 463 & 60\% \\
+personal data types & M & a form, email, chat or log excerpt; select every type of personal data it contains & 468 & 51\% \\
+symptoms reported & M & a patient's or user's description of how they feel; select every listed symptom they report & 446 & 72\% \\
+skills matched & M & a job's required skills and a candidate's profile; select every required skill the candidate clearly has & 440 & 57\% \\
+\end{longtable}

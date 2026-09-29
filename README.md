@@ -134,6 +134,10 @@ watersheep --model samratduttaofficial/WaterSheep --question "Which team should 
 
 ECE is the expected calibration error (lower is better).
 
+![Calibration by question type](results/figures/reliability.svg)
+
+Accuracy against confidence for each question type, before (raw) and after calibration.
+
 ### Benchmarks
 
 | Benchmark | Suite | Questions | Accuracy | ECE | In training data |
@@ -161,6 +165,14 @@ ECE is the expected calibration error (lower is better).
 - Data: openly licensed public datasets (listed in [NOTICE](NOTICE)) and synthetic decisions from Qwen3.5-4B.
 - Calibration: a temperature per question type, fitted on a validation split.
 
+![Training curves](results/figures/training.svg)
+
+Training loss and learning rate (left); validation accuracy by question type (right).
+
+![Synthetic data verification](results/figures/synth.svg)
+
+Share of synthetic examples kept after verification, by question type (left) and by family (right).
+
 ## Limitations
 
 - English only.
@@ -178,6 +190,20 @@ cd WaterSheep
 ```
 
 Use `scripts\run.bat` on Windows.
+
+### Results
+
+The figures, tables and data are in [`results/`](results). To remake them after training and
+`scripts/run-benchmarks.sh` (`.bat` on Windows), run these from the project root with the Python in `.venv`:
+
+| Script | Needs | Writes to `results/` |
+|---|---|---|
+| `tools/results/data_stats.py` | a trained model | `data/data_stats.json` |
+| `tools/results/make_figures.py` | `data_stats.py`, benchmarks | `figures/`, `data/synth_outcomes_by_type.json` |
+| `tools/results/gen_tables.py` | `data_stats.py` | `tables/sources.tex`, `tables/families.tex` |
+| `tools/results/bench_table.py` | benchmarks | `tables/bench.tex`, `tables/speed.tex`, `data/bench_summary.json` |
+
+Each uses the newest model unless `--model` is given.
 
 ## License
 

@@ -59,7 +59,11 @@ curl https://YOUR-ENDPOINT -H "Authorization: Bearer $HF_TOKEN" -H "Content-Type
 
 ECE is the expected calibration error (lower is better).
 
+{{calibration}}
+
 {{benchmarks}}
+
+{{training}}
 
 ## Limitations
 

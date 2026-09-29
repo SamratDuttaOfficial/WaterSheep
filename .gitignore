@@ -42,6 +42,7 @@ __pycache__/
 
 # LaTeX build output
 *.pdf
+!/results/figures/*.pdf
 *.aux
 *.bbl
 *.blg

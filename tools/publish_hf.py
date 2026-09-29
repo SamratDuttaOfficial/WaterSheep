@@ -32,6 +32,14 @@ HF_CODE = ROOT / "huggingface"
 IN_TRAINING = {"no": "no", "YES - same split": "same split", "other split only": "other split"}
 ONNX = "onnx/model_quantized.onnx"
 PUBLISH_FILES = HUB_FILES + ["onnx/*"]
+FIGURES = {
+    "reliability": ("Calibration by question type",
+                    "Accuracy against confidence for each question type, before (raw) and after calibration."),
+    "training": ("Training curves",
+                 "Training loss and learning rate (left); validation accuracy by question type (right)."),
+    "synth": ("Synthetic data verification",
+              "Share of synthetic examples kept after verification, by question type (left) and by family (right)."),
+}
 
 
 def git(*args) -> str:
@@ -117,6 +125,14 @@ def js_block(site: str, title: str, onnx: bool) -> str:
     if onnx:
         lines += ["", "Other languages: run `%s` with ONNX Runtime; `watersheep.js` shows the input format." % ONNX]
     return "\n".join(lines)
+
+
+def figure(site: str, name: str) -> str:
+    """A figure from results/figures, as published on the project site."""
+    if not site:
+        return ""
+    alt, caption = FIGURES[name]
+    return "![%s](%sfigures/%s.svg)\n\n%s" % (alt, site, name, caption)
 
 
 def hf_config(d: Path, meta: dict) -> dict:
@@ -211,6 +227,8 @@ def render_card(repo: str, meta: dict, d: Path, a) -> str:
         "header": header(title, site, space, url),
         "javascript": js_block(site, title, (d / ONNX).exists() or remote_onnx),
         "metrics": metrics_table(meta), "benchmarks": bench_table(meta["name"]),
+        "calibration": figure(site, "reliability"),
+        "training": "## Training\n\n%s\n\n%s" % (figure(site, "training"), figure(site, "synth")) if site else "",
         "author": author(), "year": str(meta.get("created") or time.strftime("%Y"))[:4],
     }
     text = TEMPLATE.read_text(encoding="utf-8")
