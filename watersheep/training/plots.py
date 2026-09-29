@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List
 
-from .paths import P
-from .util import LOG, iter_jsonl, read_json
+from ..core.paths import P
+from ..core.util import LOG, iter_jsonl, read_json
 
 
 def _plt():

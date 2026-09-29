@@ -4,10 +4,10 @@ import collections
 import random
 from typing import Dict, List, Optional
 
-from . import interrupt
-from .paths import P
+from ..core import interrupt
+from ..core.paths import P
 from .schema import is_digit_scale, noul_question
-from .util import LOG, append_jsonl, clean_text, iter_jsonl, read_json, stable_int, write_json
+from ..core.util import LOG, append_jsonl, clean_text, iter_jsonl, read_json, stable_int, write_json
 
 MAX_LABELS = 150
 CHUNK = 25
@@ -30,7 +30,7 @@ def load() -> dict:
 
 
 def _plan(cfg, names: List[str], synth) -> List[dict]:
-    from .data import raw_file
+    from .dataset import raw_file
     jobs = []
     for name in names:
         recs = list(iter_jsonl(raw_file(name)))
@@ -122,7 +122,7 @@ def _ask(teacher, j: dict) -> Optional[dict]:
 
 
 def run(cfg, teacher, names: List[str], synth) -> dict:
-    from .pool import pool_map
+    from ..core.pool import pool_map
     jobs = _plan(cfg, names, list(synth))
     done = {r["id"] for r in iter_jsonl(_rows())}
     todo = [j for j in jobs if _job_id(j) not in done]

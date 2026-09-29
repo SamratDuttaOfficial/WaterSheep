@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Offline end-to-end test on toy data.
 
-  python selftest.py
-  python selftest.py --real-teacher
+  python tests/selftest.py
+  python tests/selftest.py --real-teacher
 """
 from __future__ import annotations
 import os
@@ -12,7 +12,8 @@ import threading
 import time
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
+HERE = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(HERE))
 HOME = HERE / ".selftest"
 os.environ["WATERSHEEP_HOME"] = str(HOME)  # set before importing watersheep
 
@@ -27,11 +28,11 @@ def check(cond, msg):
 
 def unit_tests():
     print("\n== unit tests")
-    from watersheep import sources as S
-    from watersheep.llm import label_probs, loose_json
-    from watersheep.schema import validate
-    from watersheep.synth import Deduper, accept_blind, soft_target, to_record
-    from watersheep.config import Config
+    from watersheep.data import sources as S
+    from watersheep.synth.llm import label_probs, loose_json
+    from watersheep.data.schema import validate
+    from watersheep.synth.generate import Deduper, accept_blind, soft_target, to_record
+    from watersheep.core.config import Config
     cfg = Config()
 
     c = S.Ctx("t", 1, 0, {"label": ["Company", "EducationalInstitution", "Artist", "Athlete"]}, {})
@@ -97,9 +98,9 @@ def unit_tests():
 
 def watch_and_stop(step: int):
     """Request a stop once training passes `step`."""
-    from watersheep import interrupt
-    from watersheep.paths import P
-    from watersheep.util import iter_jsonl
+    from watersheep.core import interrupt
+    from watersheep.core.paths import P
+    from watersheep.core.util import iter_jsonl
 
     def loop():
         while not interrupt.stopping():
@@ -114,10 +115,10 @@ def watch_and_stop(step: int):
 
 def pipeline(real_teacher: bool):
     print("\n== pipeline (in %s)" % HOME)
-    import run
-    from watersheep import interrupt
-    from watersheep.paths import P
-    from watersheep.util import read_json
+    from watersheep import run
+    from watersheep.core import interrupt
+    from watersheep.core.paths import P
+    from watersheep.core.util import read_json
     import torch
     sets = ["sources=toy:stock,toy:cheapest,toy:delay,toy:tags", "use_kaggle=false",
             "per_source_max=500", "heldout_sources=toy:delay", "audit_per_source=10",

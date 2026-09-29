@@ -10,13 +10,13 @@ import sys
 import time
 import traceback
 
-from watersheep import interrupt
-from watersheep.config import Config, stage_hashes
-from watersheep.paths import P, ensure_dirs, pin_caches
-from watersheep.state import Manifest, Registry
-from watersheep.util import (LOG, dir_size, human_bytes, human_time, now_ts, pid_alive, read_json,
+from watersheep.core import interrupt
+from watersheep.core.config import Config, stage_hashes
+from watersheep.core.paths import P, ensure_dirs, pin_caches
+from watersheep.core.state import Manifest, Registry
+from watersheep.core.util import (LOG, dir_size, human_bytes, human_time, now_ts, pid_alive, read_json,
                              rmtree, setup_logging)
-from watersheep import stages as S
+from watersheep.training import stages as S
 
 BAR = "-" * 78
 
@@ -85,7 +85,7 @@ def show_summary(reg) -> None:
     ex = reg.active("export")
     if ex:
         print(BAR + "\n  model: %s" % ex["path"])
-        print("  use it:  python predict.py --question \"...\" --state \"...\" --options a,b,c")
+        print("  use it:  python -m watersheep.cli --question \"...\" --state \"...\" --options a,b,c")
     print("  graphs:  %s" % (P.plots / "dashboard.png"))
     print(BAR + "\n")
 
@@ -120,18 +120,18 @@ def run_stage(name, cfg, man, reg, h, force=False) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="run.py", formatter_class=argparse.RawDescriptionHelpFormatter,
+    p = argparse.ArgumentParser(prog="python -m watersheep.run", formatter_class=argparse.RawDescriptionHelpFormatter,
                                 description=__doc__, epilog="""examples:
-  python run.py                        run / resume everything
-  python run.py --forever              keep going: more synthetic data, retrain, repeat
-  python run.py --status               what is done, what is left
-  python run.py --ui                   only the web UI (http://127.0.0.1:8765)
-  python run.py --stage synth          run one stage only
-  python run.py --from train           this stage onward
-  python run.py --set synth_target=40000     change a knob (saved in config.json)
-  python run.py --list-sources         every public dataset and its state
-  python run.py --clean synth          delete one stage's output
-  python run.py --reset                wipe everything and start over
+  python -m watersheep.run                        run / resume everything
+  python -m watersheep.run --forever              keep going: more synthetic data, retrain, repeat
+  python -m watersheep.run --status               what is done, what is left
+  python -m watersheep.run --ui                   only the web UI (http://127.0.0.1:8765)
+  python -m watersheep.run --stage synth          run one stage only
+  python -m watersheep.run --from train           this stage onward
+  python -m watersheep.run --set synth_target=40000     change a knob (saved in config.json)
+  python -m watersheep.run --list-sources         every public dataset and its state
+  python -m watersheep.run --clean synth          delete one stage's output
+  python -m watersheep.run --reset                wipe everything and start over
 """)
     g = p.add_argument_group("what to run")
     g.add_argument("--stage", action="append", metavar="NAME", help="run only this stage (repeatable)")
@@ -194,8 +194,8 @@ def main(argv=None) -> int:
                                             i["created"][:19], i.get("metrics", {})))
         return 0
     if args.list_sources:
-        from watersheep import sources as SRC
-        from watersheep.data import raw_file
+        from watersheep.data import sources as SRC
+        from watersheep.data.dataset import raw_file
         rep = read_json(P.reports / "sources.json", {}) or {}
         on = {s.name for s in SRC.enabled(cfg)}
         for s in list(SRC.REGISTRY.values()):
@@ -207,7 +207,7 @@ def main(argv=None) -> int:
         return 0
     if args.set and not any([args.stage, args.from_, args.until, args.force, args.forever]):
         show_status(cfg, man, h)
-        LOG.info("config saved. run `python run.py` to continue.")
+        LOG.info("config saved. run `python -m watersheep.run` to continue.")
         return 0
     if args.promote:
         it = reg.resolve(args.promote)
@@ -299,7 +299,7 @@ def main(argv=None) -> int:
         return 1
     finally:
         try:
-            from watersheep import llm
+            from watersheep.synth import llm
             llm.shutdown()
         except Exception:
             pass
@@ -307,7 +307,7 @@ def main(argv=None) -> int:
     show_status(cfg, man, stage_hashes(cfg, S.ORDER))
     show_summary(reg)
     if ui:
-        LOG.info("the web UI closes with this window; reopen it any time with: run.bat --ui")
+        LOG.info("the web UI closes with this window; reopen it any time with: scripts/run.bat --ui")
     return 0
 
 

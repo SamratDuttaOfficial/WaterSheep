@@ -9,11 +9,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, List
 
-from . import gpu, interrupt, llm
-from .paths import P, ensure_dirs, pin_caches
-from .schema import answers
-from .state import Manifest, Registry
-from .util import (LOG, append_jsonl, human_num, human_time, iter_jsonl,
+from ..core import gpu, interrupt
+from ..synth import llm
+from ..core.paths import P, ensure_dirs, pin_caches
+from ..data.schema import answers
+from ..core.state import Manifest, Registry
+from ..core.util import (LOG, append_jsonl, human_num, human_time, iter_jsonl,
                    now_ts, read_json, rmtree, sha1, write_json, write_jsonl)
 
 
@@ -36,7 +37,7 @@ def encoder_spec(cfg):
 
 
 def load_tok(cfg):
-    from .model import CharTok, Tok
+    from ..model import CharTok, Tok
     return CharTok() if cfg.encoder == "tiny-test" else Tok.load(cfg.encoder)
 
 
@@ -102,9 +103,9 @@ def clean_env(cfg) -> None:
 
 
 def run_teacher(cfg, man, reg, h) -> dict:
-    from .pool import pool_map
-    from .synth import make_example
-    from .taxonomy import job
+    from ..core.pool import pool_map
+    from ..synth.generate import make_example
+    from ..data.taxonomy import job
     t = llm.get_teacher(cfg)
     n = max(4, t.b.slots)
     LOG.info("teacher warm-up: %d examples in parallel to measure throughput", n)
@@ -126,7 +127,7 @@ def clean_teacher(cfg) -> None:
 
 
 def _source_key(cfg, name: str) -> str:
-    from .sources import REGISTRY
+    from ..data.sources import REGISTRY
     key = {"v": 1, "name": name, "max": cfg.per_source_max, "s": cfg.max_state_chars,
            "o": cfg.max_option_chars, "k": cfg.max_options, "seed": cfg.seed}
     ver = getattr(REGISTRY.get(name), "version", 1)
@@ -136,8 +137,8 @@ def _source_key(cfg, name: str) -> str:
 
 
 def run_sources(cfg, man, reg, h) -> dict:
-    from . import sources as S
-    from .data import raw_file
+    from ..data import sources as S
+    from ..data.dataset import raw_file
     pin_caches()
     counts, failed = {}, {}
     todo = S.enabled(cfg)
@@ -185,10 +186,10 @@ def clean_sources(cfg) -> None:
 
 
 def run_audit(cfg, man, reg, h) -> dict:
-    from .data import raw_file
-    from .pool import pool_map
-    from .sources import enabled
-    from .synth import audit_one
+    from ..data.dataset import raw_file
+    from ..core.pool import pool_map
+    from ..data.sources import enabled
+    from ..synth.generate import audit_one
     names = [s.name for s in enabled(cfg) if raw_file(s.name).exists()]
     if cfg.audit_per_source <= 0 or not names:
         write_json(P.reports / "audit.json", {"per_source": {}, "dropped": []})
@@ -246,7 +247,7 @@ def _shard(i: int, ext: str) -> Path:
 
 def _salvage_multi(cfg) -> None:
     """Relabel confident multi-label rejections in finished shards (once)."""
-    from .synth import relabel_multi, soft_target
+    from ..synth.generate import relabel_multi, soft_target
     mark = P.state / ("salvaged_multi_%s.json" % str(cfg.verify_relabel_conf).replace(".", ""))
     if mark.exists():
         return
@@ -272,9 +273,9 @@ def _salvage_multi(cfg) -> None:
 
 
 def run_synth(cfg, man, reg, h) -> dict:
-    from .pool import pool_map
-    from .synth import Deduper, make_example
-    from .taxonomy import jobs as make_jobs
+    from ..core.pool import pool_map
+    from ..synth.generate import Deduper, make_example
+    from ..data.taxonomy import jobs as make_jobs
     P.synth.mkdir(parents=True, exist_ok=True)
     _salvage_multi(cfg)
     dedup = Deduper(cfg.verify_dedup_bits)
@@ -424,9 +425,9 @@ def clean_synth(cfg) -> None:
 
 
 def run_describe(cfg, man, reg, h) -> dict:
-    from . import describe
-    from .data import raw_file, synth_records
-    from .sources import enabled
+    from ..data import describe
+    from ..data.dataset import raw_file, synth_records
+    from ..data.sources import enabled
     names = [s.name for s in enabled(cfg) if raw_file(s.name).exists()]
     return describe.run(cfg, llm.get_teacher(cfg), names, synth_records())
 
@@ -437,8 +438,8 @@ def clean_describe(cfg) -> None:
 
 
 def run_build(cfg, man, reg, h) -> dict:
-    from .data import build, raw_file
-    from .sources import enabled
+    from ..data.dataset import build, raw_file
+    from ..data.sources import enabled
     names = [s.name for s in enabled(cfg) if raw_file(s.name).exists()]
     audit = read_json(P.reports / "audit.json", {}) or {}
     dropped = audit.get("dropped", []) if cfg.audit_drop_below_chance else []
@@ -458,7 +459,7 @@ def _tok_dir(cfg, h: dict) -> Path:
 
 
 def prepare_packed(cfg, h: dict):
-    from .data import SPLITS, pack
+    from ..data.dataset import SPLITS, pack
     tok = load_tok(cfg)
     d = _tok_dir(cfg, h)
     stats = read_json(P.build / "stats.json", {}) or {}
@@ -500,7 +501,7 @@ def clean_train(cfg) -> None:
 
 def _active_model(cfg, reg: Registry, h: dict):
     import torch
-    from .data import Packed
+    from ..data.dataset import Packed
     from .trainer import build_model, load_ckpt, pick_device
     run = reg.active("run")
     if not run:
@@ -516,8 +517,8 @@ def _active_model(cfg, reg: Registry, h: dict):
 
 
 def run_calibrate(cfg, man, reg, h) -> dict:
-    from .metrics import fit_temperature, fit_temperature_multi
-    from .model import MULTI, TYPE_NAME
+    from ..metrics import fit_temperature, fit_temperature_multi
+    from ..model import MULTI, TYPE_NAME
     from .trainer import predict
     llm.shutdown()
     run, model, tok, tok_dir, device, bt, Packed = _active_model(cfg, reg, h)
@@ -538,7 +539,7 @@ def run_calibrate(cfg, man, reg, h) -> dict:
     thr = 0.5
     sel = [k for k, i in enumerate(idx) if int(va.typ[i]) == MULTI]
     if len(sel) >= 30:
-        from .metrics import sigmoid
+        from ..metrics import sigmoid
         ps = [sigmoid(logits[k], temps.get("multi", 1.0)) for k in sel]
         ys = [va.tgt[va.poff[idx[k]]:va.poff[idx[k] + 1]] > 0.5 for k in sel]
 
@@ -561,7 +562,7 @@ def clean_calibrate(cfg) -> None:
 
 
 def run_evaluate(cfg, man, reg, h) -> dict:
-    from .metrics import summarize
+    from ..metrics import summarize
     from .trainer import evaluate_rows
     llm.shutdown()
     run, model, tok, tok_dir, device, bt, Packed = _active_model(cfg, reg, h)
@@ -614,7 +615,7 @@ def clean_plots(cfg) -> None:
 
 
 def run_export(cfg, man, reg, h) -> dict:
-    from .infer import WaterSheep, export
+    from ..infer import WaterSheep, export
     run = reg.active("run")
     if not run:
         raise RuntimeError("nothing to export")

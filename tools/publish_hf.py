@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Publish an export on the Hugging Face Hub.
 
-Uploads the export (with its ONNX build, if any), the transformers code in hf/, a model card
+Uploads the export (with its ONNX build, if any), the transformers code in huggingface/, a model card
 (tools/model_card.md), LICENSE and NOTICE in one commit. Log in first with `hf auth login`.
 
   python tools/publish_hf.py --repo OWNER/NAME --dry-run     write the card to out/hf/, upload nothing
@@ -24,11 +24,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from watersheep import __version__                                       # noqa: E402
 from watersheep.infer import HUB_FILES, HUB_ID, find_export              # noqa: E402
-from watersheep.paths import P                                           # noqa: E402
-from watersheep.util import read_json                                    # noqa: E402
+from watersheep.core.paths import P                                           # noqa: E402
+from watersheep.core.util import read_json                                    # noqa: E402
 
 TEMPLATE = Path(__file__).resolve().parent / "model_card.md"
-HF_CODE = ROOT / "hf"
+HF_CODE = ROOT / "huggingface"
 IN_TRAINING = {"no": "no", "YES - same split": "same split", "other split only": "other split"}
 ONNX = "onnx/model_quantized.onnx"
 PUBLISH_FILES = HUB_FILES + ["onnx/*"]
@@ -145,8 +145,8 @@ def hf_config(d: Path, meta: dict) -> dict:
 def train_datasets() -> List[str]:
     """Hugging Face ids of the training sources (held-out sources excluded)."""
     try:
-        from watersheep.config import Config
-        from watersheep.sources import enabled
+        from watersheep.core.config import Config
+        from watersheep.data.sources import enabled
         cfg = Config.load()
         held = set(cfg.heldout_sources)
         return sorted({s.hf for s in enabled(cfg) if getattr(s, "hf", None) and s.name not in held})
@@ -168,7 +168,7 @@ def metrics_table(meta: dict) -> str:
 def bench_table(name: str) -> str:
     """Saved results of run-benchmarks for this export, if any."""
     try:
-        from benchmark import BENCHMARKS
+        from watersheep.benchmark import BENCHMARKS
     except Exception:
         return ""
     known = {b.name: b for b in BENCHMARKS}

@@ -8,9 +8,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import corpus
-from .paths import P
-from .util import LOG, dir_size, human_bytes, iter_jsonl, pid_alive, read_json
+from .data import corpus
+from .core.paths import P
+from .core.util import LOG, dir_size, human_bytes, iter_jsonl, pid_alive, read_json
 
 _CACHE: dict = {}
 _LOCK = threading.Lock()
@@ -64,7 +64,7 @@ def _synth_view(r: dict) -> dict:
 
 
 def _raw_rows(name: str) -> list:
-    from .data import raw_file
+    from .data.dataset import raw_file
     f = raw_file(name)
     return _cached(("raw", name), _stamp(f), lambda: list(iter_jsonl(f)))
 
@@ -95,9 +95,9 @@ def records(q: dict) -> dict:
 
 
 def sources() -> list:
-    from .config import Config
-    from .data import raw_file
-    from . import sources as S
+    from .core.config import Config
+    from .data.dataset import raw_file
+    from .data import sources as S
     cfg = Config.load()
     rep = read_json(P.reports / "sources.json", {}) or {}
     audit = (read_json(P.reports / "audit.json", {}) or {}).get("per_source", {})
@@ -139,10 +139,10 @@ def _disk() -> dict:
 
 
 def overview() -> dict:
-    from .config import Config, stage_hashes
-    from .stages import ORDER
-    from .state import Manifest, Registry
-    from . import gpu
+    from .core.config import Config, stage_hashes
+    from .training.stages import ORDER
+    from .core.state import Manifest, Registry
+    from .core import gpu
     cfg = Config.load()
     man, h = Manifest(), stage_hashes(cfg, ORDER)
     stages = []

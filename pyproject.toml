@@ -1,5 +1,5 @@
 # Installs the inference package (`from watersheep import WaterSheep`).
-# The training pipeline runs from a clone: run.bat / ./run.sh set up .venv on their own.
+# The training pipeline runs from a clone: scripts/run.bat / scripts/run.sh set up .venv on their own.
 [build-system]
 requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
@@ -31,8 +31,8 @@ classifiers = [
 [project.scripts]
 watersheep = "watersheep.cli:main"
 
-[tool.setuptools]
-packages = ["watersheep"]
+[tool.setuptools.packages.find]
+include = ["watersheep", "watersheep.*"]
 
 [tool.setuptools.dynamic]
 version = { attr = "watersheep.__version__" }

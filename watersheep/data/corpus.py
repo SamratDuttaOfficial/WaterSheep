@@ -3,8 +3,8 @@ from __future__ import annotations
 import threading
 from typing import Dict, Iterable
 
-from .paths import P
-from .util import read_json, sha1, write_json
+from ..core.paths import P
+from ..core.util import read_json, sha1, write_json
 
 _LOCK = threading.Lock()
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 from typing import List
 
-from .util import stable_int
+from ..core.util import stable_int
 
 FAMILIES = [
     ("binary", "escalation", "a customer conversation; decide whether it must be escalated to a human agent now"),

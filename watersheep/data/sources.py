@@ -7,9 +7,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
-from . import interrupt
+from ..core import interrupt
 from .schema import YESNO, answers, make, score_options, validate
-from .util import LOG, stable_int
+from ..core.util import LOG, stable_int
 
 
 def val(row: dict, col: str):
@@ -683,7 +683,7 @@ def load_url(src: Src, cfg, want: int, seed: int) -> List[dict]:
     """Download, unpack and read a file source."""
     from urllib.parse import unquote
     from .download import download
-    from .paths import P
+    from ..core.paths import P
     root = P.downloads / src.name.replace(":", "__")
     ready = root / ".ready"
     if not ready.exists():

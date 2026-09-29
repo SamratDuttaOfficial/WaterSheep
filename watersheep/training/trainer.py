@@ -10,11 +10,11 @@ from typing import Dict, List, Optional
 import numpy as np
 import torch
 
-from . import interrupt
-from .data import Packed, make_batches
-from .metrics import probs_for, summarize
-from .model import WaterSheepNet, decision_loss, load_encoder, soft_ce
-from .util import LOG, append_jsonl, human_num, human_time, now_iso, write_json
+from ..core import interrupt
+from ..data.dataset import Packed, make_batches
+from ..metrics import probs_for, summarize
+from ..model import WaterSheepNet, decision_loss, load_encoder, soft_ce
+from ..core.util import LOG, append_jsonl, human_num, human_time, now_iso, write_json
 
 
 def pick_device(want: str) -> torch.device:
@@ -72,7 +72,7 @@ def predict(model, ds: Packed, idx: List[int], batch_tokens: int, pad: int,
 
 def evaluate_rows(model, ds: Packed, idx, batch_tokens, pad, device, amp,
                   temps: Optional[dict] = None) -> List[dict]:
-    from .model import TYPE_NAME
+    from ..model import TYPE_NAME
     logits = predict(model, ds, idx, batch_tokens, pad, device, amp)
     rows = []
     for i, z in zip(idx, logits):

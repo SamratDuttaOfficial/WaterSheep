@@ -4,8 +4,8 @@ import random
 import re
 from typing import Dict, List, Optional, Tuple
 
-from .schema import LETTERS, YESNO, answers, make, score_options, teacher_view, validate
-from .util import clean_text, norm_text, stable_int
+from ..data.schema import LETTERS, YESNO, answers, make, score_options, teacher_view, validate
+from ..core.util import clean_text, norm_text, stable_int
 
 GEN_SYSTEM = (
     "You create realistic training examples for a decision model used inside software. "

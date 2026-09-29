@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Creates .venv (and a private Python in .python if none is found). Linux and macOS.
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
 PYDIR="$ROOT/.python"
 VENV="$ROOT/.venv"
@@ -42,4 +42,4 @@ fi
 echo "[setup] creating the virtual environment in $VENV (python: $PY)"
 "$PY" -m venv --system-site-packages "$VENV"
 "$VPY" -m pip install -q --disable-pip-version-check --upgrade pip wheel
-echo "[setup] ready. run.py installs the heavier packages itself when first needed."
+echo "[setup] ready. the pipeline installs the heavier packages itself when first needed."

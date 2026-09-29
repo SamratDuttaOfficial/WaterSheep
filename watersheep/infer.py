@@ -16,9 +16,9 @@ import torch
 
 from .metrics import concentration, sigmoid, softmax
 from .model import CharTok, Tok, WaterSheepNet, encode_records, encoder_from_dir
-from .paths import P
-from .schema import YESNO, is_digit_scale, noul_question
-from .util import LOG, now_ts, write_json
+from .core.paths import P
+from .data.schema import YESNO, is_digit_scale, noul_question
+from .core.util import LOG, now_ts, write_json
 
 TYPES_IN = {"noul": "binary", "binary": "binary", "yes/no": "binary", "boolean": "binary",
             "choice": "choice", "score": "score", "multi": "multi", "multi_choice": "multi",
@@ -32,7 +32,7 @@ HUB_FILES = ["watersheep.json", "model.safetensors", "encoder/*", "tokenizer/*"]
 def export(cfg, run_dir: Path, tok, encoder_spec, temps: dict, metrics: dict,
            run_id: str, multi_threshold: float = 0.5) -> Path:
     from safetensors.torch import save_file
-    from .trainer import load_ckpt
+    from .training.trainer import load_ckpt
     blob = load_ckpt(run_dir / "best.pt")
     d = P.export / ("watersheep_%s" % now_ts())
     (d / "encoder").mkdir(parents=True, exist_ok=True)
@@ -152,7 +152,7 @@ class WaterSheep:
             if path:
                 raise FileNotFoundError("no WaterSheep model at %r - give an export folder, an export "
                                         "name or a Hugging Face repo id (owner/name)" % str(path))
-            raise FileNotFoundError("no exported WaterSheep model found - run `python run.py`, "
+            raise FileNotFoundError("no exported WaterSheep model found - run `python -m watersheep.run`, "
                                     "or load a Hugging Face repo id (owner/name)")
         meta = json.loads((d / "watersheep.json").read_text(encoding="utf-8"))
         tok = CharTok() if meta.get("tokenizer") == "char" else Tok.load(str(d / "tokenizer"))

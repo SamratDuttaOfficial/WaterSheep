@@ -15,13 +15,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, List, Optional
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np                                                       # noqa: E402
 
-from watersheep import interrupt                                         # noqa: E402
-from watersheep.paths import P, pin_caches                               # noqa: E402
-from watersheep.schema import YESNO                                      # noqa: E402
-from watersheep.util import (LOG, iter_jsonl, now_iso, read_json, setup_logging, stable_int,  # noqa: E402
+from watersheep.core import interrupt  # noqa: E402
+from watersheep.core.paths import P, pin_caches                               # noqa: E402
+from watersheep.data.schema import YESNO                                      # noqa: E402
+from watersheep.core.util import (LOG, iter_jsonl, now_iso, read_json, setup_logging, stable_int,  # noqa: E402
                              write_json, write_jsonl)
 
 OUT = P.out / "benchmarks"
@@ -182,7 +181,7 @@ def items_for(b: Bench, limit: int) -> List[dict]:
 def trained_on(b: Bench) -> str:
     """Whether the training corpus uses this dataset."""
     try:
-        from watersheep.sources import registry
+        from watersheep.data.sources import registry
         hits = [s for s in registry().values() if getattr(s, "hf", None) == b.hf]
     except Exception:
         return "unknown"
@@ -223,8 +222,8 @@ def teacher_dir_name(llm_model: str) -> str:
 
 def teacher_predict(t, b: Bench, items: List[dict]):
     """Teacher probabilities per item (None where unanswered), or None if stopped."""
-    from watersheep.pool import pool_map
-    from watersheep.synth import blind_probs, multi_probs
+    from watersheep.core.pool import pool_map
+    from watersheep.synth.generate import blind_probs, multi_probs
     opts = b.texts()
 
     def one(k: int):
@@ -545,7 +544,7 @@ def summary(model: str, done: List[tuple], hist: List[dict], teacher: Optional[d
     lines = ["# WaterSheep benchmarks - %s" % model, "",
              "Accuracy for multi-label is exact match (every option right); its F1 is micro-F1.",
              "Majority = accuracy of always giving the most common answer.",
-             "Teacher = accuracy of the teacher LLM on the same questions (benchmark.py --teacher).", "",
+             "Teacher = accuracy of the teacher LLM on the same questions (watersheep.benchmark --teacher).", "",
              "| Benchmark | Suite | Type | N | Accuracy | Macro-F1 | F1 | ECE | Majority | Teacher | vs previous | ms/q |",
              "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     suites = {}
@@ -632,8 +631,8 @@ def main() -> int:
     interrupt.install()
     ws = t = None
     if a.teacher:
-        from watersheep import llm
-        from watersheep.config import Config
+        from watersheep.synth import llm
+        from watersheep.core.config import Config
         cfg = Config.load()
         model, run_id = teacher_dir_name(cfg.llm_model), cfg.llm_model
         t = llm.get_teacher(cfg)
@@ -715,7 +714,7 @@ def main() -> int:
     if ws is not None and not a.no_analysis and not interrupt.stopping():
         extra = analysis(ws, d, a.force)
     if t is not None:
-        from watersheep import llm
+        from watersheep.synth import llm
         llm.shutdown()
 
     names = {b.name for b, _ in done}

@@ -12,9 +12,10 @@ import urllib.request
 from pathlib import Path
 from typing import List, Optional
 
-from . import gpu, interrupt, ollama
-from .paths import P
-from .util import LOG, read_json, write_json
+from ..core import gpu, interrupt
+from . import ollama
+from ..core.paths import P
+from ..core.util import LOG, read_json, write_json
 
 LETTERS = "ABCDEFGHIJ"
 STOP_TOKENS = ["<|im_end|>", "<|endoftext|>"]

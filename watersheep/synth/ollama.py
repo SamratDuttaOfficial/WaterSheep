@@ -11,10 +11,10 @@ import zipfile
 from pathlib import Path
 from typing import Optional
 
-from . import interrupt
-from .download import download
-from .paths import P
-from .util import LOG, human_bytes
+from ..core import interrupt
+from ..data.download import download
+from ..core.paths import P
+from ..core.util import LOG, human_bytes
 
 SYSTEM_URL = "http://127.0.0.1:11434"
 PRIVATE_PORT = 11534

@@ -6,7 +6,7 @@
 from __future__ import annotations
 from typing import List, Optional, Tuple
 
-from .util import clean_text, norm_text
+from ..core.util import clean_text, norm_text
 
 TYPES = ("binary", "choice", "score", "multi")
 YESNO = ["yes", "no"]

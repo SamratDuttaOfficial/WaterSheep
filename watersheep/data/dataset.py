@@ -7,11 +7,11 @@ from typing import Dict, List
 
 import numpy as np
 
-from . import interrupt
-from .model import TYPE_ID, encode_records
-from .paths import P
+from ..core import interrupt
+from ..model import TYPE_ID, encode_records
+from ..core.paths import P
 from .schema import hard_target, validate
-from .util import (LOG, iter_jsonl, norm_text, read_json, rmtree, stable_int, write_json,
+from ..core.util import (LOG, iter_jsonl, norm_text, read_json, rmtree, stable_int, write_json,
                    write_jsonl)
 
 SPLITS = ("train", "val", "test", "zeroshot")

@@ -1,7 +1,7 @@
 @echo off
 rem Creates .venv (and a private Python in .python if none is found).
 setlocal EnableExtensions EnableDelayedExpansion
-set "ROOT=%~dp0"
+for %%I in ("%~dp0..") do set "ROOT=%%~fI\"
 set "PYDIR=%ROOT%.python"
 set "VENV=%ROOT%.venv"
 set "VPY=%VENV%\Scripts\python.exe"
@@ -50,7 +50,7 @@ if errorlevel 1 (
     exit /b 1
 )
 "%VPY%" -m pip install -q --disable-pip-version-check --upgrade pip wheel
-echo [setup] ready. run.py installs the heavier packages itself when first needed.
+echo [setup] ready. the pipeline installs the heavier packages itself when first needed.
 exit /b 0
 
 :try

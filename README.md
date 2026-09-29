@@ -174,10 +174,10 @@ ECE is the expected calibration error (lower is better).
 ```bash
 git clone https://github.com/SamratDuttaOfficial/WaterSheep
 cd WaterSheep
-./run.sh
+./scripts/run.sh
 ```
 
-Use `run.bat` on Windows.
+Use `scripts\run.bat` on Windows.
 
 ## License
 

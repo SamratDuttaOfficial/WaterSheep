@@ -62,7 +62,7 @@ def main(argv=None, pin: bool = False) -> int:
     ap.add_argument("--device", help="cuda or cpu")
     a = ap.parse_args(argv)
     if pin:
-        from .paths import pin_caches
+        from .core.paths import pin_caches
         pin_caches()
     from .infer import WaterSheep
     try:
@@ -99,4 +99,4 @@ def main(argv=None, pin: bool = False) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(pin=True))

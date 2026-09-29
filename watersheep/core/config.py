@@ -176,11 +176,11 @@ def stage_hashes(cfg: Config, order: List[str]) -> Dict[str, str]:
     for name in order:
         own = {k: d.get(k) for k in STAGE_KEYS.get(name, [])}
         if name == "sources":
-            from .sources import REGISTRY
+            from ..data.sources import REGISTRY
             own["_catalog"] = sorted(n if s.version == 1 else "%s@%d" % (n, s.version)
                                      for n, s in REGISTRY.items())
         elif name == "build":
-            from .corpus import digest
+            from ..data.corpus import digest
             own["_edits"] = digest()
         out[name] = sha1({"own": own, "deps": [out.get(x) for x in STAGE_DEPS.get(name, [])]})
     return out

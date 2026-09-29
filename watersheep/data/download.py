@@ -7,8 +7,8 @@ import time
 import urllib.request
 from pathlib import Path
 
-from . import interrupt
-from .util import LOG, human_bytes, human_time
+from ..core import interrupt
+from ..core.util import LOG, human_bytes, human_time
 
 UA = {"User-Agent": "watersheep"}
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-CODE_ROOT = Path(__file__).resolve().parent.parent
+CODE_ROOT = Path(__file__).resolve().parents[2]
 ROOT = Path(os.environ.get("WATERSHEEP_HOME") or CODE_ROOT).resolve()
 
 
