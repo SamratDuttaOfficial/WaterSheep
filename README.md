@@ -78,14 +78,96 @@ With a downloaded copy on your web server, call `load({ base: "WaterSheep/" })` 
 
 Other languages: run `onnx/model_quantized.onnx` with ONNX Runtime; `watersheep.js` shows the input format.
 
-## Command line
+## Python package
 
 ```bash
 pip install git+https://github.com/SamratDuttaOfficial/WaterSheep
+```
+
+```python
+from watersheep import WaterSheep
+
+ws = WaterSheep.load("samratduttaofficial/WaterSheep")
+ws.decide("I was charged twice.", "Which team should handle this?", ["billing", "shipping", "support"])
+```
+
+`decide` returns the answer, its confidence and a probability for every option. `ask` answers several
+questions about one text:
+
+```python
+ws.ask({
+    "state": {"customer": "Priya (premium plan)",
+              "message": "Charged twice for order #4411 and the package is 12 days late."},
+    "questions": {
+        "escalate": {"type": "noul", "instructions": "Should a human agent take over now?"},
+        "team": {"type": "choice", "instructions": "Which team should handle this?",
+                 "criteria": {"billing": "payments, refunds", "shipping": "delivery problems"}},
+        "frustration": {"type": "score", "instructions": "How frustrated is the customer?",
+                        "criteria": ["calm", "annoyed", "frustrated", "furious"]},
+        "issues": {"type": "multi", "instructions": "Which issues are reported?",
+                   "criteria": ["double charge", "late delivery", "damaged item"]},
+    },
+})
+```
+
+| Type | Question | Answer |
+|---|---|---|
+| `noul` | yes/no | probability of yes |
+| `choice` | single choice | the option, with a probability for each |
+| `score` | rating scale | the expected level, with a probability for each |
+| `multi` | multi-label | every option above the threshold, with probabilities |
+
+Command line:
+
+```bash
 watersheep --model samratduttaofficial/WaterSheep --question "Which team should handle this?" --options billing,shipping,support --state "I was charged twice."
 ```
 
 `--serve` runs a local HTTP API on port 8766.
+
+## Evaluation
+
+| Evaluation | Accuracy | ECE |
+|---|---|---|
+| In-distribution test split | 77.8% | 0.026 |
+| Held-out datasets, not seen in training | 61.2% | 0.043 |
+
+ECE is the expected calibration error (lower is better).
+
+### Benchmarks
+
+| Benchmark | Suite | Questions | Accuracy | ECE | In training data |
+|---|---|---|---|---|---|
+| [goemotions](https://huggingface.co/datasets/google-research-datasets/go_emotions) | sentiment | 2000 | 22.4% | 0.023 | other split |
+| [hatecheck](https://huggingface.co/datasets/Paul/hatecheck) | safety | 2000 | 75.1% | 0.139 | no |
+| [legal_abercrombie](https://huggingface.co/datasets/nguha/legalbench) | legal | 95 | 21.1% | 0.316 | no |
+| [legal_contract_nli_confidentiality_of_agreement](https://huggingface.co/datasets/nguha/legalbench) | legal | 82 | 69.5% | 0.177 | no |
+| [legal_corporate_lobbying](https://huggingface.co/datasets/nguha/legalbench) | legal | 490 | 68.4% | 0.216 | no |
+| [legal_cuad_audit_rights](https://huggingface.co/datasets/nguha/legalbench) | legal | 1216 | 86.3% | 0.041 | no |
+| [legal_definition_classification](https://huggingface.co/datasets/nguha/legalbench) | legal | 1337 | 56.9% | 0.279 | no |
+| [legal_function_of_decision_section](https://huggingface.co/datasets/nguha/legalbench) | legal | 367 | 24.3% | 0.245 | no |
+| [legal_hearsay](https://huggingface.co/datasets/nguha/legalbench) | legal | 94 | 56.4% | 0.307 | no |
+| [legal_overruling](https://huggingface.co/datasets/nguha/legalbench) | legal | 2000 | 62.5% | 0.151 | no |
+| [legal_personal_jurisdiction](https://huggingface.co/datasets/nguha/legalbench) | legal | 50 | 50.0% | 0.160 | no |
+| [legal_privacy_policy_qa](https://huggingface.co/datasets/nguha/legalbench) | legal | 2000 | 58.9% | 0.274 | no |
+| [legal_proa](https://huggingface.co/datasets/nguha/legalbench) | legal | 95 | 51.6% | 0.379 | no |
+| [legal_ucc_v_common_law](https://huggingface.co/datasets/nguha/legalbench) | legal | 94 | 62.8% | 0.171 | no |
+| [prompt_injection](https://huggingface.co/datasets/deepset/prompt-injections) | safety | 116 | 91.4% | 0.079 | other split |
+| [xstest](https://huggingface.co/datasets/Paul/XSTest) | safety | 450 | 73.6% | 0.140 | no |
+
+## Training
+
+- Base model: [answerdotai/ModernBERT-base](https://huggingface.co/answerdotai/ModernBERT-base), fine-tuned with a decision head.
+- Data: openly licensed public datasets (listed in [NOTICE](NOTICE)) and synthetic decisions from Qwen3.5-4B.
+- Calibration: a temperature per question type, fitted on a validation split.
+
+## Limitations
+
+- English only.
+- Long inputs are truncated.
+- Rating-scale answers are less accurate than the other types.
+- Probabilities are calibrated on data like the training data; validate them on your own.
+- Not for high-stakes decisions (medical, legal, financial, hiring) on its own.
 
 ## Train a new model
 
@@ -99,4 +181,15 @@ Use `run.bat` on Windows.
 
 ## License
 
-Apache 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Apache 2.0 ([LICENSE](LICENSE)). Attributions: [NOTICE](NOTICE).
+
+## Citation
+
+```bibtex
+@misc{watersheep,
+  author = {Samrat Dutta},
+  title  = {WaterSheep: calibrated decisions for any text},
+  year   = {2026},
+  url    = {https://huggingface.co/samratduttaofficial/WaterSheep}
+}
+```
