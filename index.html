@@ -83,10 +83,11 @@
   td:first-child { white-space: normal; }
   .num { text-align: right; font-variant-numeric: tabular-nums; }
   section h3.minor { font-size: 18px; margin: 32px 0 12px; }
-  .cols { display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-  .cols h2 { margin-bottom: 14px; }
-  ul.points { padding-left: 20px; margin: 0; }
+  ul.points { padding-left: 20px; margin: 12px 0 0; }
   ul.points li { margin: 8px 0; }
+  .fig { margin: 28px 0 0; }
+  .fig img { display: block; box-sizing: border-box; width: 100%; height: auto; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  .fig figcaption { color: var(--muted); font-size: 14px; margin-top: 8px; }
   footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
   footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
   @media (max-width: 640px) {
@@ -212,21 +213,34 @@ ws.ask({
       <h2>Evaluation</h2>
       <p class="sub">ECE is the expected calibration error (lower is better).</p>
       <div class="table"><table><thead><tr><th>Evaluation</th><th class="num">Accuracy</th><th class="num">ECE</th></tr></thead><tbody><tr><td>In-distribution test split</td><td class="num">77.8%</td><td class="num">0.026</td></tr><tr><td>Held-out datasets, not seen in training</td><td class="num">61.2%</td><td class="num">0.043</td></tr></tbody></table></div>
+      <figure class="fig">
+        <a href="figures/reliability.svg"><img src="figures/reliability.svg" alt="Reliability diagrams: accuracy against confidence for each question type" width="613" height="194" loading="lazy"></a>
+        <figcaption>Accuracy against confidence for each question type, before (raw) and after calibration.</figcaption>
+      </figure>
       <h3 class="minor">Benchmarks</h3>
       <div class="table"><table><thead><tr><th>Benchmark</th><th>Suite</th><th class="num">Questions</th><th class="num">Accuracy</th><th class="num">ECE</th><th>In training data</th></tr></thead><tbody><tr><td><a href="https://huggingface.co/datasets/google-research-datasets/go_emotions">goemotions</a></td><td>sentiment</td><td class="num">2,000</td><td class="num">22.4%</td><td class="num">0.023</td><td>other split</td></tr><tr><td><a href="https://huggingface.co/datasets/Paul/hatecheck">hatecheck</a></td><td>safety</td><td class="num">2,000</td><td class="num">75.1%</td><td class="num">0.139</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_abercrombie</a></td><td>legal</td><td class="num">95</td><td class="num">21.1%</td><td class="num">0.316</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_contract_nli_confidentiality_of_agreement</a></td><td>legal</td><td class="num">82</td><td class="num">69.5%</td><td class="num">0.177</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_corporate_lobbying</a></td><td>legal</td><td class="num">490</td><td class="num">68.4%</td><td class="num">0.216</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_cuad_audit_rights</a></td><td>legal</td><td class="num">1,216</td><td class="num">86.3%</td><td class="num">0.041</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_definition_classification</a></td><td>legal</td><td class="num">1,337</td><td class="num">56.9%</td><td class="num">0.279</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_function_of_decision_section</a></td><td>legal</td><td class="num">367</td><td class="num">24.3%</td><td class="num">0.245</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_hearsay</a></td><td>legal</td><td class="num">94</td><td class="num">56.4%</td><td class="num">0.307</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_overruling</a></td><td>legal</td><td class="num">2,000</td><td class="num">62.5%</td><td class="num">0.151</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_personal_jurisdiction</a></td><td>legal</td><td class="num">50</td><td class="num">50.0%</td><td class="num">0.160</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_privacy_policy_qa</a></td><td>legal</td><td class="num">2,000</td><td class="num">58.9%</td><td class="num">0.274</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_proa</a></td><td>legal</td><td class="num">95</td><td class="num">51.6%</td><td class="num">0.379</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/nguha/legalbench">legal_ucc_v_common_law</a></td><td>legal</td><td class="num">94</td><td class="num">62.8%</td><td class="num">0.171</td><td>no</td></tr><tr><td><a href="https://huggingface.co/datasets/deepset/prompt-injections">prompt_injection</a></td><td>safety</td><td class="num">116</td><td class="num">91.4%</td><td class="num">0.079</td><td>other split</td></tr><tr><td><a href="https://huggingface.co/datasets/Paul/XSTest">xstest</a></td><td>safety</td><td class="num">450</td><td class="num">73.6%</td><td class="num">0.140</td><td>no</td></tr></tbody></table></div>
     </div>
   </section>
 
   <section id="training">
-    <div class="wrap cols">
-      <div>
-        <h2>Training</h2>
-        <ul class="points"><li>Base model: <a href="https://huggingface.co/answerdotai/ModernBERT-base">answerdotai/ModernBERT-base</a>, fine-tuned with a decision head.</li><li>Data: openly licensed public datasets (listed in <a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE">NOTICE</a>) and synthetic decisions from Qwen3.5-4B.</li><li>Calibration: a temperature per question type, fitted on a validation split.</li></ul>
-      </div>
-      <div>
-        <h2>Limitations</h2>
-        <ul class="points"><li>English only.</li><li>Long inputs are truncated.</li><li>Rating-scale answers are less accurate than the other types.</li><li>Probabilities are calibrated on data like the training data; validate them on your own.</li><li>Not for high-stakes decisions (medical, legal, financial, hiring) on its own.</li></ul>
-      </div>
+    <div class="wrap">
+      <h2>Training</h2>
+      <ul class="points"><li>Base model: <a href="https://huggingface.co/answerdotai/ModernBERT-base">answerdotai/ModernBERT-base</a>, fine-tuned with a decision head.</li><li>Data: openly licensed public datasets (listed in <a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE">NOTICE</a>) and synthetic decisions from Qwen3.5-4B.</li><li>Calibration: a temperature per question type, fitted on a validation split.</li></ul>
+      <figure class="fig">
+        <a href="figures/training.svg"><img src="figures/training.svg" alt="Training loss, learning rate and validation accuracy by question type" width="610" height="206" loading="lazy"></a>
+        <figcaption>Training loss and learning rate (left); validation accuracy by question type (right).</figcaption>
+      </figure>
+      <figure class="fig">
+        <a href="figures/synth.svg"><img src="figures/synth.svg" alt="Share of synthetic examples kept after verification" width="623" height="203" loading="lazy"></a>
+        <figcaption>Share of synthetic examples kept after verification, by question type (left) and by family (right).</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="limitations">
+    <div class="wrap">
+      <h2>Limitations</h2>
+      <ul class="points"><li>English only.</li><li>Long inputs are truncated.</li><li>Rating-scale answers are less accurate than the other types.</li><li>Probabilities are calibrated on data like the training data; validate them on your own.</li><li>Not for high-stakes decisions (medical, legal, financial, hiring) on its own.</li></ul>
     </div>
   </section>
 
