@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WaterSheep</title>
+<meta name="description" content="Calibrated decisions for yes/no, choice, rating and multi-label questions. Open source under Apache 2.0.">
+<meta property="og:title" content="WaterSheep">
+<meta property="og:description" content="Calibrated decisions for yes/no, choice, rating and multi-label questions.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0e7490">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f7fafc; --surface: #ffffff; --text: #0f172a; --muted: #475569; --line: #e2e8f0;
+    --accent: #0e7490; --accent-2: #0891b2; --accent-soft: #e0f2fe; --code-bg: #0f172a; --code-text: #e2e8f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1220; --surface: #111a2e; --text: #e5edf7; --muted: #9fb0c6; --line: #1f2a44;
+      --accent: #22d3ee; --accent-2: #67e8f9; --accent-soft: #0c2a3a; --code-bg: #0a0f1c; --code-text: #d7e3f4;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  a { color: var(--accent); }
+  a:focus-visible, .btn:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+  header.top { border-bottom: 1px solid var(--line); background: var(--surface); }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--text); text-decoration: none; }
+  nav a { margin-left: 18px; color: var(--muted); text-decoration: none; font-size: 15px; }
+  nav a:hover { color: var(--accent); }
+
+  .hero { padding: 32px 20px 56px; text-align: center; }
+  .banner {
+    display: block; width: 100%; height: auto; aspect-ratio: 3 / 1; object-fit: cover; object-position: 35% 50%;
+    border-radius: 16px; border: 1px solid var(--line); margin: 0 0 36px; background: #2b3a55;
+  }
+  .hero h1 { font-size: clamp(32px, 5.5vw, 48px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
+  .hero p.lead { font-size: clamp(17px, 2.4vw, 20px); color: var(--muted); max-width: 640px; margin: 0 auto 28px; }
+  .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 11px 20px; border-radius: 10px; font-weight: 600; text-decoration: none;
+    border: 1px solid var(--line); color: var(--text); background: var(--surface);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @media (prefers-color-scheme: dark) { .btn.primary { color: #06202a; } }
+  .btn:hover { filter: brightness(1.06); }
+  .tags { margin-top: 22px; color: var(--muted); font-size: 14px; }
+
+  section { padding: 56px 0; border-top: 1px solid var(--line); }
+  section h2 { font-size: 28px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  section p.sub { color: var(--muted); margin: 0 0 28px; max-width: 760px; }
+
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card .kind { display: inline-block; font: 600 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                color: var(--accent); background: var(--accent-soft); padding: 5px 8px; border-radius: 6px; margin-bottom: 10px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  .demo-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px 22px; }
+  .note { color: var(--muted); font-size: 14px; margin-top: 12px; }
+
+  pre {
+    background: var(--code-bg); color: var(--code-text); padding: 16px 18px; border-radius: 12px; overflow-x: auto;
+    font: 14px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin: 0 0 16px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+  .steps h3 { font-size: 16px; margin: 22px 0 8px; }
+  .s { color: #a7f3d0; } .k { color: #f9a8d4; } .c { color: #7dd3fc; }
+
+  ul.points { padding-left: 20px; margin: 0; }
+  ul.points li { margin: 8px 0; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  @media (max-width: 640px) {
+    nav a:not(.gh) { display: none; }
+    .banner { aspect-ratio: 2 / 1; margin-bottom: 28px; }
+    .demo-card { padding: 14px 12px 18px; }
+  }
+</style>
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="logo.svg" alt="" width="30" height="30">WaterSheep</a>
+    <nav>
+      <a href="#demo">Demo</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#start">Get started</a>
+      <a class="gh" href="https://github.com/SamratDuttaOfficial/WaterSheep">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero wrap">
+    <img class="banner" src="banner.svg" alt="" width="1200" height="400">
+    <h1>Calibrated decisions for any text</h1>
+    <p class="lead">Yes/no, single-choice, rating and multi-label answers, each with a reliable probability.</p>
+    <div class="buttons">
+      <a class="btn primary" href="#demo">Try the demo</a>
+      <a class="btn" href="https://huggingface.co/samratduttaofficial/WaterSheep">Hugging Face</a>
+      <a class="btn" href="https://github.com/SamratDuttaOfficial/WaterSheep">GitHub</a>
+    </div>
+    <div class="tags">Apache 2.0 · Open weights</div>
+  </div>
+
+  <section id="demo">
+    <div class="wrap">
+      <h2>Live demo</h2>
+      <p class="sub">Runs entirely in your browser. Data stays on your device.</p>
+      <div class="demo-card"><div id="watersheep-demo"></div></div>
+      <p class="note">Also on <a href="https://huggingface.co/spaces/samratduttaofficial/WaterSheep">Hugging Face Spaces</a>.</p>
+    </div>
+  </section>
+
+  <section id="capabilities">
+    <div class="wrap">
+      <h2>Capabilities</h2>
+      <p class="sub">Options are defined per request, so one model covers routing, triage, moderation, scoring and tagging.</p>
+      <div class="grid">
+        <div class="card"><span class="kind">noul</span><h3>Yes / No</h3><p>Probability of yes.</p></div>
+        <div class="card"><span class="kind">choice</span><h3>Single choice</h3><p>Best option, with a probability for each.</p></div>
+        <div class="card"><span class="kind">score</span><h3>Rating</h3><p>Expected level on a scale.</p></div>
+        <div class="card"><span class="kind">multi</span><h3>Multi-label</h3><p>Every applicable option, each with its own probability.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="wrap steps">
+      <h2>Get started</h2>
+      <p class="sub">The model downloads from Hugging Face on first use, then runs locally.</p>
+      <h3>Install</h3>
+<pre>pip install git+https://github.com/SamratDuttaOfficial/WaterSheep</pre>
+      <h3>Python</h3>
+<pre><span class="k">from</span> watersheep <span class="k">import</span> WaterSheep
+
+ws = WaterSheep.load(<span class="s">"samratduttaofficial/WaterSheep"</span>)
+ws.decide(<span class="s">"I was charged twice."</span>, <span class="s">"Which team should handle this?"</span>,
+          [<span class="s">"billing"</span>, <span class="s">"shipping"</span>, <span class="s">"support"</span>])</pre>
+      <h3>Command line and HTTP API</h3>
+<pre>watersheep --model samratduttaofficial/WaterSheep --question <span class="s">"Which team should handle this?"</span> --options billing,shipping,support --state <span class="s">"I was charged twice."</span>
+watersheep --model samratduttaofficial/WaterSheep --serve</pre>
+      <p><code>--serve</code> exposes <code>POST http://127.0.0.1:8766/v1/decisions</code>.</p>
+      <h3>JavaScript</h3>
+<pre>&lt;script type="module"&gt;
+  <span class="k">import</span> { decide } <span class="k">from</span> <span class="s">"https://samratduttaofficial.github.io/WaterSheep/watersheep.js"</span>;
+  console.log(<span class="k">await</span> decide(<span class="s">"I was charged twice."</span>, <span class="s">"Which team should handle this?"</span>, [<span class="s">"billing"</span>, <span class="s">"shipping"</span>, <span class="s">"support"</span>]));
+&lt;/script&gt;</pre>
+      <h3>Download and run locally</h3>
+<pre>hf download samratduttaofficial/WaterSheep --local-dir WaterSheep</pre>
+      <p>Or <code>git clone https://huggingface.co/samratduttaofficial/WaterSheep</code> (requires Git LFS).
+        Then use the <code>WaterSheep</code> folder in place of the model id:</p>
+<pre>ws = WaterSheep.load(<span class="s">"WaterSheep"</span>)
+watersheep --model WaterSheep --serve</pre>
+      <p>JavaScript: <code>load({ base: "WaterSheep/" })</code>. Other languages: run
+        <code>WaterSheep/onnx/model_quantized.onnx</code> with ONNX Runtime.</p>
+    </div>
+  </section>
+
+  <section id="design">
+    <div class="wrap">
+      <h2>Design</h2>
+      <ul class="points">
+        <li><strong>Single pass.</strong> Context, question and options are scored jointly. No generation, no parsing.</li>
+        <li><strong>Calibrated.</strong> Probabilities are calibrated per question type and usable as confidence scores.</li>
+        <li><strong>Open.</strong> Code and weights under Apache 2.0, trained on openly licensed data.
+          See <a href="https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE">NOTICE</a>.</li>
+        <li><strong>Portable.</strong> Python API, REST endpoint and ONNX.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Samrat Dutta · Apache 2.0</span>
+    <span><a href="https://github.com/SamratDuttaOfficial/WaterSheep">GitHub</a> ·
+      <a href="https://huggingface.co/samratduttaofficial/WaterSheep">Hugging Face</a></span>
+  </div>
+</footer>
+<script type="module" src="demo.js"></script>
+</body>
+</html>
