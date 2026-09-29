@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Publish an export on the Hugging Face Hub.
 
-Uploads the export (with its ONNX build, if any), a model card (tools/model_card.md), LICENSE and
-NOTICE in one commit. Log in first with `hf auth login` (or set HF_TOKEN).
+Uploads the export (with its ONNX build, if any), the transformers code in hf/, a model card
+(tools/model_card.md), LICENSE and NOTICE in one commit. Log in first with `hf auth login`.
 
   python tools/publish_hf.py --repo OWNER/NAME --dry-run     write the card to out/hf/, upload nothing
   python tools/publish_hf.py --repo OWNER/NAME               the newest export
@@ -28,6 +28,7 @@ from watersheep.paths import P                                           # noqa:
 from watersheep.util import read_json                                    # noqa: E402
 
 TEMPLATE = Path(__file__).resolve().parent / "model_card.md"
+HF_CODE = ROOT / "hf"
 IN_TRAINING = {"no": "no", "YES - same split": "same split", "other split only": "other split"}
 ONNX = "onnx/model_quantized.onnx"
 PUBLISH_FILES = HUB_FILES + ["onnx/*"]
@@ -104,14 +105,41 @@ def header(title: str, site: str, space: str, url: str) -> str:
     return "![%s](%sbanner.svg)\n\n# ![](%slogo.svg) %s\n\n%s" % (title, site, site, title, links)
 
 
-def js_block(site: str) -> str:
+def js_block(site: str, title: str, onnx: bool) -> str:
     if not site:
         return ""
-    return "\n".join(["**JavaScript**, no install:", "",
-                      "```html", '<script type="module">',
-                      '  import { decide } from "%swatersheep.js";' % site,
-                      '  console.log(await decide("I was charged twice.", "Which team should handle this?", '
-                      '["billing", "shipping", "support"]));', "</script>", "```"])
+    lines = ["## JavaScript", "", "No install; runs in the browser:", "",
+             "```html", '<script type="module">',
+             '  import { decide } from "%swatersheep.js";' % site,
+             '  console.log(await decide("I was charged twice.", "Which team should handle this?", '
+             '["billing", "shipping", "support"]));', "</script>", "```", "",
+             'With a downloaded copy on your web server, call `load({ base: "%s/" })` first.' % title]
+    if onnx:
+        lines += ["", "Other languages: run `%s` with ONNX Runtime; `watersheep.js` shows the input format." % ONNX]
+    return "\n".join(lines)
+
+
+def hf_config(d: Path, meta: dict) -> dict:
+    """config.json for loading the export with transformers (trust_remote_code)."""
+    enc = read_json(d / "encoder" / "config.json", {}) or {}
+    return {
+        "architectures": ["WaterSheepModel"],
+        "model_type": "watersheep",
+        "auto_map": {"AutoConfig": "modeling_watersheep.WaterSheepConfig",
+                     "AutoModel": "modeling_watersheep.WaterSheepModel"},
+        "custom_pipelines": {"zero-shot-classification": {
+            "impl": "pipeline_watersheep.WaterSheepPipeline", "pt": ["AutoModel"]}},
+        "encoder_config": enc,
+        "head_layers": meta.get("head_layers", 1),
+        "max_len": meta["max_len"],
+        "max_question_tokens": meta["max_question_tokens"],
+        "max_option_tokens": meta["max_option_tokens"],
+        "max_options": meta.get("max_options", 10),
+        "temperatures": meta.get("temperatures") or {},
+        "multi_threshold": meta.get("multi_threshold", 0.5),
+        "dtype": enc.get("dtype", "float32"),
+        "transformers_version": enc.get("transformers_version"),
+    }
 
 
 def train_datasets() -> List[str]:
@@ -163,13 +191,11 @@ def bench_table(name: str) -> str:
 
 def front_matter(meta: dict) -> str:
     base = str(meta.get("encoder") or "")
-    lines = ["---", "license: apache-2.0", "language:", "- en", "library_name: watersheep",
+    lines = ["---", "license: apache-2.0", "language:", "- en", "library_name: transformers",
              "pipeline_tag: zero-shot-classification"]
     if HUB_ID.match(base):
         lines.append("base_model: %s" % base)
     lines += ["tags:", "- decision-model", "- calibration", "- multi-label"]
-    if "modernbert" in base.lower():
-        lines.append("- modernbert")
     ds = train_datasets()
     if ds:
         lines += ["datasets:"] + ["- %s" % x for x in ds]
@@ -177,20 +203,15 @@ def front_matter(meta: dict) -> str:
 
 
 def render_card(repo: str, meta: dict, d: Path, a) -> str:
-    base = str(meta.get("encoder") or "")
     url = code_url() if a.code_url is None else a.code_url
     site, space, remote_onnx = online(repo, url)
     title = repo.split("/")[-1]
     fill = {
         "title": title, "repo_id": repo, "version": __version__, "name": meta["name"],
-        "header": header(title, site, space, url), "javascript": js_block(site),
-        "install": a.install or ("pip install git+%s" % url if url else "pip install watersheep"),
+        "header": header(title, site, space, url),
+        "javascript": js_block(site, title, (d / ONNX).exists() or remote_onnx),
         "metrics": metrics_table(meta), "benchmarks": bench_table(meta["name"]),
-        "base_model": "[%s](https://huggingface.co/%s)" % (base, base) if HUB_ID.match(base)
-        else (base or "a transformer encoder"),
         "author": author(), "year": str(meta.get("created") or time.strftime("%Y"))[:4],
-        "onnx": "- **Other languages:** run `%s/%s` with ONNX Runtime." % (title, ONNX)
-        if (d / ONNX).exists() or remote_onnx else "",
     }
     text = TEMPLATE.read_text(encoding="utf-8")
     for k, v in fill.items():
@@ -199,7 +220,7 @@ def render_card(repo: str, meta: dict, d: Path, a) -> str:
     return front_matter(meta) + "\n" + text
 
 
-def upload(a, uploads, card: str, meta_bytes: bytes, name: str) -> int:
+def upload(a, uploads, card: str, meta_bytes: bytes, config: bytes, name: str) -> int:
     from huggingface_hub import CommitOperationAdd, HfApi
     api = HfApi()
     try:
@@ -211,6 +232,7 @@ def upload(a, uploads, card: str, meta_bytes: bytes, name: str) -> int:
     api.create_repo(a.repo, private=a.private, exist_ok=True)
     ops = [CommitOperationAdd(path_in_repo=rel, path_or_fileobj=str(f)) for rel, f in uploads]
     ops += [CommitOperationAdd(path_in_repo="watersheep.json", path_or_fileobj=meta_bytes),
+            CommitOperationAdd(path_in_repo="config.json", path_or_fileobj=config),
             CommitOperationAdd(path_in_repo="README.md", path_or_fileobj=card.encode("utf-8"))]
     info = api.create_commit(a.repo, operations=ops, commit_message="Upload %s %s (%s)" % (
         a.repo.split("/")[-1], __version__, name))
@@ -230,7 +252,6 @@ def main() -> int:
     ap.add_argument("--tag", help="also tag the upload, e.g. v%s" % __version__)
     ap.add_argument("--private", action="store_true", help="create the repo as private")
     ap.add_argument("--code-url", help="link to the code (default: the git remote 'origin', '' for none)")
-    ap.add_argument("--install", help="install command shown in the card")
     ap.add_argument("--dry-run", action="store_true", help="write the card to out/hf/ and upload nothing")
     a = ap.parse_args()
     if not HUB_ID.match(a.repo) or "@" in a.repo:
@@ -251,6 +272,7 @@ def main() -> int:
         print("%s is incomplete, missing: %s" % (d, ", ".join(missing)))
         return 1
     extra = [(n, ROOT / n) for n in ("LICENSE", "NOTICE") if (ROOT / n).exists()]
+    extra += [(f.name, f) for f in sorted(HF_CODE.glob("*")) if f.suffix in (".py", ".txt")]
     if len(extra) < 2:
         print("warning: LICENSE or NOTICE is missing in %s" % ROOT)
     if not (d / ONNX).exists():
@@ -261,19 +283,22 @@ def main() -> int:
 
     card = render_card(a.repo, meta, d, a)
     meta_bytes = (json.dumps(meta, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    config = (json.dumps(hf_config(d, meta), indent=2, ensure_ascii=False) + "\n").encode("utf-8")
     uploads = files + extra
     print("%s -> https://huggingface.co/%s" % (d, a.repo))
     for rel, f in uploads:
         print("  %-30s %9.1f MB" % (rel, f.stat().st_size / 2 ** 20))
-    print("  %-30s (with name %s)\n  %-30s (model card)" % ("watersheep.json", meta["name"], "README.md"))
+    print("  %-30s (with name %s)\n  %-30s\n  %-30s (model card)" % (
+        "watersheep.json", meta["name"], "config.json", "README.md"))
     if a.dry_run:
         out = P.out / "hf" / a.repo.replace("/", "--")
         out.mkdir(parents=True, exist_ok=True)
         (out / "README.md").write_text(card, encoding="utf-8")
         (out / "watersheep.json").write_bytes(meta_bytes)
+        (out / "config.json").write_bytes(config)
         print("dry run - nothing uploaded; model card: %s" % (out / "README.md"))
         return 0
-    return upload(a, uploads, card, meta_bytes, meta["name"])
+    return upload(a, uploads, card, meta_bytes, config, meta["name"])
 
 
 if __name__ == "__main__":

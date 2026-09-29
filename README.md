@@ -13,41 +13,59 @@ Calibrated decisions for any text.
 [Model](https://huggingface.co/samratduttaofficial/WaterSheep)
 
 WaterSheep answers yes/no, single-choice, rating and multi-label questions about any text, with a
-probability for every option. The trained model is on Hugging Face, ready to use.
-
-## Install
-
-```bash
-pip install git+https://github.com/SamratDuttaOfficial/WaterSheep
-```
+probability for every option.
 
 ## Usage
 
-The model downloads from Hugging Face on first use, then runs locally.
-
-**Python**
+```bash
+pip install transformers torch
+```
 
 ```python
-from watersheep import WaterSheep
+from transformers import pipeline
 
-ws = WaterSheep.load("samratduttaofficial/WaterSheep")
-ws.decide("I was charged twice.", "Which team should handle this?", ["billing", "shipping", "support"])
+ws = pipeline(model="samratduttaofficial/WaterSheep", trust_remote_code=True)
+ws("I was charged twice.", question="Which team should handle this?", options=["billing", "shipping", "support"])
 ```
 
-**Command line**
+| Type | Options | Answer |
+|---|---|---|
+| `noul` | none (yes/no) | probability of yes |
+| `choice` | any labels | the best option |
+| `score` | a digit scale, e.g. `1` to `5` | the expected level |
+| `multi` | any labels, with `type="multi"` | every option above the threshold |
+
+Every answer includes a probability for each option.
+
+## Download
 
 ```bash
-watersheep --model samratduttaofficial/WaterSheep --question "Which team should handle this?" --options billing,shipping,support --state "I was charged twice."
+hf download samratduttaofficial/WaterSheep --local-dir WaterSheep
 ```
 
-**HTTP API**
+Or with Git (requires [Git LFS](https://git-lfs.com)):
 
 ```bash
-watersheep --model samratduttaofficial/WaterSheep --serve
-curl http://127.0.0.1:8766/v1/decisions -d '{"state": "I was charged twice.", "questions": {"team": {"type": "choice", "instructions": "Which team should handle this?", "criteria": ["billing", "shipping", "support"]}}}'
+git clone https://huggingface.co/samratduttaofficial/WaterSheep
 ```
 
-**JavaScript**, no install:
+Then load it from the folder, offline:
+
+```python
+ws = pipeline(model="WaterSheep", trust_remote_code=True)
+```
+
+## API
+
+Deploy it as a Hugging Face [Inference Endpoint](https://endpoints.huggingface.co), then:
+
+```bash
+curl https://YOUR-ENDPOINT -H "Authorization: Bearer $HF_TOKEN" -H "Content-Type: application/json" -d '{"inputs": "I was charged twice.", "parameters": {"question": "Which team should handle this?", "options": ["billing", "shipping", "support"]}}'
+```
+
+## JavaScript
+
+No install; runs in the browser:
 
 ```html
 <script type="module">
@@ -56,43 +74,20 @@ curl http://127.0.0.1:8766/v1/decisions -d '{"state": "I was charged twice.", "q
 </script>
 ```
 
-| Type | Question | Answer |
-|---|---|---|
-| `noul` | yes/no | probability of yes |
-| `choice` | single choice | the option, with a probability for each |
-| `score` | rating scale | the expected level, with a probability for each |
-| `multi` | multi-label | every option above the threshold |
+With a downloaded copy on your web server, call `load({ base: "WaterSheep/" })` first.
 
-## Download and run locally
+Other languages: run `onnx/model_quantized.onnx` with ONNX Runtime; `watersheep.js` shows the input format.
 
-Download the model from Hugging Face:
+## Command line
 
 ```bash
-hf download samratduttaofficial/WaterSheep --local-dir WaterSheep
+pip install git+https://github.com/SamratDuttaOfficial/WaterSheep
+watersheep --model samratduttaofficial/WaterSheep --question "Which team should handle this?" --options billing,shipping,support --state "I was charged twice."
 ```
 
-Or `git clone https://huggingface.co/samratduttaofficial/WaterSheep` (requires Git LFS).
+`--serve` runs a local HTTP API on port 8766.
 
-Then use the `WaterSheep` folder in place of the model id:
-
-```python
-from watersheep import WaterSheep
-
-ws = WaterSheep.load("WaterSheep")
-ws.decide("I was charged twice.", "Which team should handle this?", ["billing", "shipping", "support"])
-```
-
-```bash
-watersheep --model WaterSheep --question "Which team should handle this?" --options billing,shipping,support --state "I was charged twice."
-watersheep --model WaterSheep --serve
-```
-
-- **JavaScript:** call `load({ base: "WaterSheep/" })` before `decide`, with the folder on your web server.
-- **Other languages:** run `WaterSheep/onnx/model_quantized.onnx` with ONNX Runtime.
-
-## Build from source
-
-Only needed to train a new model:
+## Train a new model
 
 ```bash
 git clone https://github.com/SamratDuttaOfficial/WaterSheep
@@ -100,7 +95,7 @@ cd WaterSheep
 ./run.sh
 ```
 
-Use `run.bat` on Windows. `--help` lists all options; `run-benchmarks` evaluates the result.
+Use `run.bat` on Windows.
 
 ## License
 

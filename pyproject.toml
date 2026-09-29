@@ -16,7 +16,7 @@ requires-python = ">=3.10"
 dependencies = [
     "torch>=2.4",
     "numpy>=1.24",
-    "transformers>=4.48",
+    "transformers>=5",
     "safetensors>=0.4",
     "huggingface_hub>=0.34",
 ]

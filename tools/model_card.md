@@ -3,73 +3,55 @@
 {{title}} answers yes/no, single-choice, rating and multi-label questions about any text, with a
 probability for every option. Version {{version}} (`{{name}}`).
 
-## Install
-
-```bash
-{{install}}
-```
-
 ## Usage
 
-The model downloads from Hugging Face on first use, then runs locally.
-
-**Python**
+```bash
+pip install transformers torch
+```
 
 ```python
-from watersheep import WaterSheep
+from transformers import pipeline
 
-ws = WaterSheep.load("{{repo_id}}")
-ws.decide("I was charged twice.", "Which team should handle this?", ["billing", "shipping", "support"])
+ws = pipeline(model="{{repo_id}}", trust_remote_code=True)
+ws("I was charged twice.", question="Which team should handle this?", options=["billing", "shipping", "support"])
 ```
 
-**Command line**
-
-```bash
-watersheep --model {{repo_id}} --question "Which team should handle this?" --options billing,shipping,support --state "I was charged twice."
-```
-
-**HTTP API**
-
-```bash
-watersheep --model {{repo_id}} --serve
-curl http://127.0.0.1:8766/v1/decisions -d '{"state": "I was charged twice.", "questions": {"team": {"type": "choice", "instructions": "Which team should handle this?", "criteria": ["billing", "shipping", "support"]}}}'
-```
-
-{{javascript}}
-
-| Type | Question | Answer |
+| Type | Options | Answer |
 |---|---|---|
-| `noul` | yes/no | probability of yes |
-| `choice` | single choice | the option, with a probability for each |
-| `score` | rating scale | the expected level, with a probability for each |
-| `multi` | multi-label | every option above the threshold |
+| `noul` | none (yes/no) | probability of yes |
+| `choice` | any labels | the best option |
+| `score` | a digit scale, e.g. `1` to `5` | the expected level |
+| `multi` | any labels, with `type="multi"` | every option above the threshold |
 
-## Download and run locally
+Every answer includes a probability for each option.
 
-Download the model:
+## Download
 
 ```bash
 hf download {{repo_id}} --local-dir {{title}}
 ```
 
-Or `git clone https://huggingface.co/{{repo_id}}` (requires Git LFS).
-
-Then use the `{{title}}` folder in place of the model id:
-
-```python
-from watersheep import WaterSheep
-
-ws = WaterSheep.load("{{title}}")
-ws.decide("I was charged twice.", "Which team should handle this?", ["billing", "shipping", "support"])
-```
+Or with Git (requires Git LFS):
 
 ```bash
-watersheep --model {{title}} --question "Which team should handle this?" --options billing,shipping,support --state "I was charged twice."
-watersheep --model {{title}} --serve
+git clone https://huggingface.co/{{repo_id}}
 ```
 
-- **JavaScript:** call `load({ base: "{{title}}/" })` before `decide`, with the folder on your web server.
-{{onnx}}
+Then load it from the folder, offline:
+
+```python
+ws = pipeline(model="{{title}}", trust_remote_code=True)
+```
+
+## API
+
+Deploy it as an [Inference Endpoint](https://endpoints.huggingface.co), then:
+
+```bash
+curl https://YOUR-ENDPOINT -H "Authorization: Bearer $HF_TOKEN" -H "Content-Type: application/json" -d '{"inputs": "I was charged twice.", "parameters": {"question": "Which team should handle this?", "options": ["billing", "shipping", "support"]}}'
+```
+
+{{javascript}}
 
 ## Evaluation
 
@@ -78,12 +60,6 @@ watersheep --model {{title}} --serve
 ECE is the expected calibration error (lower is better).
 
 {{benchmarks}}
-
-## Training
-
-- Base model: {{base_model}}, fine-tuned with a decision head.
-- Data: openly licensed public datasets (listed in `NOTICE`) and synthetic decisions from Qwen3.5-4B.
-- Calibration: a temperature per question type, fitted on a validation split.
 
 ## Limitations
 
@@ -95,7 +71,7 @@ ECE is the expected calibration error (lower is better).
 
 ## License
 
-Apache 2.0 (`LICENSE`). Attributions: `NOTICE`.
+Apache 2.0 (`LICENSE`). Trained on openly licensed data; credits in `NOTICE`.
 
 ## Citation
 
