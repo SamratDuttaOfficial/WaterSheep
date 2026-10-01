@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120" role="img" aria-label="Buy me a coffee">
+  <defs>
+    <clipPath id="card"><rect width="400" height="120" rx="18"/></clipPath>
+  </defs>
+  <g clip-path="url(#card)">
+    <rect width="400" height="120" fill="#ffdd00"/>
+    <circle cx="378" cy="8" r="52" fill="#ffe84d"/>
+    <g fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round">
+      <path d="M48 36c-6-5 6-9 0-15s4-8 0-11"/>
+      <path d="M62 36c-6-5 6-9 0-15s4-8 0-11"/>
+      <path d="M76 36c-6-5 6-9 0-15s4-8 0-11"/>
+    </g>
+    <ellipse cx="62" cy="100" rx="40" ry="7" fill="#fff"/>
+    <path d="M90 52h5a12 12 0 0 1 0 24h-7" fill="none" stroke="#fff" stroke-width="7"/>
+    <path d="M34 44h56v26a26 26 0 0 1-26 26h-4a26 26 0 0 1-26-26z" fill="#fff"/>
+    <ellipse cx="62" cy="44" rx="28" ry="6" fill="#78350f"/>
+    <ellipse cx="56" cy="43" rx="9" ry="2" fill="#a16207"/>
+    <path d="M62 82c-9-5-13-10-13-15a6.5 6.5 0 0 1 13-1.5a6.5 6.5 0 0 1 13 1.5c0 5-4 10-13 15z" fill="#f97316"/>
+    <path d="M110 24l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#fff"/>
+    <text x="128" y="58" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="25" font-weight="700" fill="#3b1d06">Buy me a coffee</text>
+    <text x="128" y="84" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="14.5" fill="#5b3410">Keep WaterSheep free and open →</text>
+  </g>
+</svg>

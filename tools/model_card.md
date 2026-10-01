@@ -90,4 +90,7 @@ Apache 2.0 (`LICENSE`). Trained on openly licensed data; credits in `NOTICE`.
 
 ---
 
-If WaterSheep helps you, please consider [buying me a coffee](https://buymeacoffee.com/samratdutta).
+<p align="center">
+  <a href="https://doi.org/10.13140/RG.2.2.28606.45122"><img src="https://samratduttaofficial.github.io/WaterSheep/preprint.svg" alt="Read the preprint" width="400"></a>
+  <a href="https://buymeacoffee.com/samratdutta"><img src="https://samratduttaofficial.github.io/WaterSheep/coffee.svg" alt="Buy me a coffee" width="400"></a>
+</p>
