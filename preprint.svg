@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120" role="img" aria-label="Read the preprint">
+  <defs>
+    <clipPath id="card"><rect width="400" height="120" rx="18"/></clipPath>
+  </defs>
+  <g clip-path="url(#card)">
+    <rect width="400" height="120" fill="#0e7490"/>
+    <circle cx="378" cy="8" r="52" fill="#118aa8"/>
+    <rect x="34" y="20" width="60" height="84" rx="7" fill="#0b5f75" transform="rotate(-9 64 62)"/>
+    <path d="M38 16h40l18 18v66a7 7 0 0 1-7 7H38a7 7 0 0 1-7-7V23a7 7 0 0 1 7-7z" fill="#fff"/>
+    <path d="M78 16v13a5 5 0 0 0 5 5h13z" fill="#bae6fd"/>
+    <rect x="39" y="38" width="32" height="5" rx="2.5" fill="#0e7490"/>
+    <rect x="39" y="49" width="46" height="3" rx="1.5" fill="#cbd5e1"/>
+    <rect x="39" y="56" width="40" height="3" rx="1.5" fill="#cbd5e1"/>
+    <rect x="39" y="66" width="48" height="31" rx="4" fill="#ecfeff"/>
+    <path d="M43 93L83 70" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <polyline points="43,92 53,87 63,80 73,76 83,71" fill="none" stroke="#0891b2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#0891b2"><circle cx="53" cy="87" r="2.5"/><circle cx="63" cy="80" r="2.5"/><circle cx="73" cy="76" r="2.5"/></g>
+    <path d="M104 22l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#fde68a"/>
+    <text x="128" y="58" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="25" font-weight="700" fill="#fff">Read the preprint</text>
+    <text x="128" y="84" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="14.5" fill="#e0f2fe">The full paper behind WaterSheep →</text>
+  </g>
+</svg>

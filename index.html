@@ -56,6 +56,11 @@
   section { padding: 56px 0; border-top: 1px solid var(--line); }
   section h2 { font-size: 28px; margin: 0 0 8px; letter-spacing: -0.01em; }
   section p.sub { color: var(--muted); margin: 0 0 28px; max-width: 760px; }
+  .support { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+  .support a { flex: 0 1 400px; border-radius: 18px; transition: transform .15s; }
+  .support a:hover { transform: translateY(-3px); }
+  .support img { display: block; width: 100%; height: auto; }
+  @media (prefers-reduced-motion: reduce) { .support a { transition: none; } }
 
   .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
@@ -259,7 +264,10 @@ ws.ask({
 
   <section id="support">
     <div class="wrap">
-      <p>If WaterSheep helps you, please consider <a href="https://buymeacoffee.com/samratdutta">buying me a coffee</a>.</p>
+      <div class="support">
+        <a href="https://doi.org/10.13140/RG.2.2.28606.45122"><img src="preprint.svg" alt="Read the preprint" width="400" height="120"></a>
+        <a href="https://buymeacoffee.com/samratdutta"><img src="coffee.svg" alt="Buy me a coffee" width="400" height="120"></a>
+      </div>
     </div>
   </section>
 </main>
@@ -269,6 +277,7 @@ ws.ask({
     <span>© 2026 Samrat Dutta · Apache 2.0</span>
     <span><a href="https://github.com/SamratDuttaOfficial/WaterSheep">GitHub</a> ·
       <a href="https://huggingface.co/samratduttaofficial/WaterSheep">Hugging Face</a> ·
+      <a href="https://doi.org/10.13140/RG.2.2.28606.45122">Preprint</a> ·
       <a href="https://buymeacoffee.com/samratdutta">Buy me a coffee</a></span>
   </div>
 </footer>
