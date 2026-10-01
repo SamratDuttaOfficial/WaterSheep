@@ -88,6 +88,6 @@ Apache 2.0 (`LICENSE`). Trained on openly licensed data; credits in `NOTICE`.
 }
 ```
 
-## Support
+---
 
-If WaterSheep is useful to you, you can [buy me a coffee](https://buymeacoffee.com/samratdutta).
+If WaterSheep helps you, please consider [buying me a coffee](https://buymeacoffee.com/samratdutta).
