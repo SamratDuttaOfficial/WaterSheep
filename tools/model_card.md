@@ -87,3 +87,7 @@ Apache 2.0 (`LICENSE`). Trained on openly licensed data; credits in `NOTICE`.
   url    = {https://huggingface.co/{{repo_id}}}
 }
 ```
+
+## Support
+
+If WaterSheep is useful to you, you can [buy me a coffee](https://buymeacoffee.com/samratdutta).

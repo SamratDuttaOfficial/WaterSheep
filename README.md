@@ -219,3 +219,7 @@ Apache 2.0 ([LICENSE](LICENSE)). Attributions: [NOTICE](NOTICE).
   url    = {https://huggingface.co/samratduttaofficial/WaterSheep}
 }
 ```
+
+## Support
+
+If WaterSheep is useful to you, you can [buy me a coffee](https://buymeacoffee.com/samratdutta).
