@@ -37,6 +37,25 @@ ws("I was charged twice.", question="Which team should handle this?", options=["
 
 Every answer includes a probability for each option.
 
+## Using Jev?
+
+WaterSheep is an open-source alternative to Jev. Run it as a local server:
+
+```bash
+pip install git+https://github.com/SamratDuttaOfficial/WaterSheep
+watersheep --model samratduttaofficial/WaterSheep --serve
+```
+
+It answers Jev's `POST /v1/systemone` requests on your machine, and TypeSafe's Python SDK works against it
+without code changes:
+
+```bash
+export TYPESAFE_BASE_URL=http://127.0.0.1:8766
+```
+
+Any API key value works locally. Multi-label questions (`"type": "multi"`) work too, as plain JSON.
+WaterSheep is independent and not affiliated with TypeSafe AI.
+
 ## Download
 
 ```bash
