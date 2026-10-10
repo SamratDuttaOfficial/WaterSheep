@@ -28,6 +28,7 @@ from watersheep.core.paths import P                                           # 
 from watersheep.core.util import read_json                                    # noqa: E402
 
 TEMPLATE = Path(__file__).resolve().parent / "model_card.md"
+VIDEO = "https://youtu.be/VjSiBecOiRI"
 HF_CODE = ROOT / "huggingface"
 IN_TRAINING = {"no": "no", "YES - same split": "same split", "other split only": "other split"}
 ONNX = "onnx/model_quantized.onnx"
@@ -107,7 +108,7 @@ def online(repo: str, url: str) -> Tuple[str, str, bool]:
 
 
 def header(title: str, site: str, space: str, url: str) -> str:
-    links = " · ".join("[%s](%s)" % (k, v) for k, v in (("Website", site), ("Demo", space), ("Code", url)) if v)
+    links = " · ".join("[%s](%s)" % (k, v) for k, v in (("Website", site), ("Demo", space), ("Code", url), ("Video", VIDEO)) if v)
     if not site:
         return "# %s\n\n%s" % (title, links)
     return "![%s](%sbanner.svg)\n\n# ![](%slogo.svg) %s\n\n%s" % (title, site, site, title, links)
