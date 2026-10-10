@@ -196,9 +196,35 @@ def fig_reliability():
     save(fig, "reliability")
 
 
+def fig_coverage():
+    f = DATA / "coverage.json"
+    if not f.exists():
+        raise SystemExit("%s not found - run tools/results/coverage.py first" % f)
+    cov = json.load(open(f))
+    fig, ax = plt.subplots(figsize=(3.3, 2.2))
+    for key, label, color in (("test", "Test split", C["binary"]), ("heldout", "Held-out datasets", C["red"])):
+        pts = cov[key]["curve"]
+        ax.plot([100 * p[0] for p in pts], [100 * p[1] for p in pts], color=color, label=label)
+        for a in cov[key]["thresholds"]:
+            if a["threshold"] in (0.7, 0.9, 0.97) and a["error"] is not None:
+                ax.scatter([100 * a["coverage"]], [100 * a["error"]], s=14, color=color, edgecolor="white",
+                           linewidth=0.4, zorder=3)
+                off = (3, -8) if a["threshold"] < 0.97 else (3, 4) if key == "test" else (-15, 4)
+                ax.annotate("%.2f" % a["threshold"], (100 * a["coverage"], 100 * a["error"]),
+                            textcoords="offset points", xytext=off, fontsize=6, color=color)
+    ax.set_xlabel("Coverage: questions answered (%)")
+    ax.set_ylabel("Error among answered (%)")
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 42)
+    ax.grid(color="#dddddd", lw=0.4)
+    ax.legend(frameon=False, loc="upper left")
+    fig.tight_layout()
+    save(fig, "coverage")
+
+
 if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from common import model_arg
     ARGS = model_arg("Render the figures (newest export unless --model).")
-    for w in ARGS.what or ["synth", "training", "reliability"]:
+    for w in ARGS.what or ["synth", "training", "reliability", "coverage"]:
         globals()["fig_" + w]()

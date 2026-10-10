@@ -158,6 +158,10 @@ ECE is the expected calibration error (lower is better).
 
 Accuracy against confidence for each question type, before (raw) and after calibration.
 
+![Error against coverage](results/figures/coverage.svg)
+
+Error among the questions answered when the model only answers above a confidence threshold. The dots mark thresholds of 0.70, 0.90 and 0.97.
+
 ### Benchmarks
 
 | Benchmark | Suite | Questions | Accuracy | ECE | In training data |
@@ -196,7 +200,7 @@ Share of synthetic examples kept after verification, by question type (left) and
 ## Limitations
 
 - English only.
-- Long inputs are truncated.
+- Long inputs are truncated. The `watersheep` package and its server mark such answers with `"truncated": true`.
 - Rating-scale answers are less accurate than the other types.
 - Probabilities are calibrated on data like the training data; validate them on your own.
 - Not for high-stakes decisions (medical, legal, financial, hiring) on its own.

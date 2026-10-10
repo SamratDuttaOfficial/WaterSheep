@@ -87,7 +87,7 @@ ECE is the expected calibration error (lower is better).
 ## Limitations
 
 - English only.
-- Long inputs are truncated.
+- Long inputs are truncated. The `watersheep` package and its server mark such answers with `"truncated": true`.
 - Rating-scale answers are less accurate than the other types.
 - Probabilities are calibrated on data like the training data; validate them on your own.
 - Not for high-stakes decisions (medical, legal, financial, hiring) on its own.
