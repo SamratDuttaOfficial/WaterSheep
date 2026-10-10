@@ -209,7 +209,7 @@ def predict(ws, b: Bench, items: List[dict]):
         if out[i] is None:
             if interrupt.stopping():
                 return None
-            out[i], _ = ws._probs(b.type, it["state"], it["question"], opts)
+            out[i] = ws._probs(b.type, it["state"], it["question"], opts)[0]
     return out
 
 

@@ -207,6 +207,29 @@ def pipeline(real_teacher: bool):
           "40-label choice via tournament")
     check("error" in a["bad"], "invalid question reports an error instead of failing the request")
 
+    # The fact that decides the answer sits just past the input limit: it must not reach the model,
+    # and the answer has to say that text was dropped.
+    from watersheep.model import encode_records
+    m = ws.meta
+    q, opts = "Ship it?", ["yes", "no"]
+    fact = " Correction: the warehouse is empty."
+    short = "Stock: 50 cables."
+    long = short + " Note for the file." * (m["max_len"] // 4)
+
+    def ids(state):
+        rec = {"type": "binary", "state": state, "question": q, "options": opts}
+        return next(encode_records(ws.tok, [rec], m["max_len"], m["max_question_tokens"],
+                                   m["max_option_tokens"]))[0]
+    s0, s1 = ws.decide(short, q, opts), ws.decide(short + fact, q, opts)
+    l0, l1 = ws.decide(long, q, opts), ws.decide(long + fact, q, opts)
+    check("truncated" not in s0 and "truncated" not in s1 and ids(short) != ids(short + fact),
+          "a deciding fact inside the input limit reaches the model")
+    check(l0.get("truncated") is True and l1.get("truncated") is True and
+          ids(long) == ids(long + fact) and l0["probs"] == l1["probs"],
+          "a deciding fact past the input limit changes nothing, and the answer is marked truncated")
+    res = ws.ask({"state": long + fact, "questions": {"ship": {"type": "noul", "instructions": q}}})
+    check(res["answers"]["ship"].get("truncated") is True, "ask marks a truncated answer")
+
     before = syn.get("accepted", 0)
     if not real_teacher:
         want = before + 60

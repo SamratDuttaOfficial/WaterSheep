@@ -169,11 +169,11 @@ class WaterSheep:
         return cls(net, tok, meta, dev, name)
 
     @torch.no_grad()
-    def _logits(self, recs: List[dict]):
-        """Logits per record and the input token count."""
+    def _logits(self, recs: List[dict], cut: Optional[list] = None):
+        """Logits per record and the input token count. `cut` collects whether each record lost text."""
         m = self.meta
         enc = list(encode_records(self.tok, recs, m["max_len"], m["max_question_tokens"],
-                                  m["max_option_tokens"]))
+                                  m["max_option_tokens"], cut=cut))
         out, tokens = [], 0
         for i in range(0, len(enc), 64):
             part = enc[i:i + 64]
@@ -199,21 +199,23 @@ class WaterSheep:
         return out, tokens
 
     def _probs(self, t: str, state: str, question: str, opts: List[str], size: int = 0):
-        """Probabilities over any number of options."""
+        """Probabilities over any number of options, the input token count, and whether text was dropped."""
         T = self.temps.get(t, 1.0)
         n = len(opts)
         size = min(size or self.cap, n)
         tok = 0
         while True:
+            cut = []
             if n <= size:
-                (z,), k = self._logits([{"type": t, "state": state, "question": question, "options": opts}])
+                (z,), k = self._logits([{"type": t, "state": state, "question": question, "options": opts}],
+                                       cut)
                 tok += k
                 if z is not None:
-                    return (sigmoid(z, T) if t == "multi" else softmax(z, T)), tok
+                    return (sigmoid(z, T) if t == "multi" else softmax(z, T)), tok, any(cut)
             else:
                 groups = [list(range(k, min(n, k + size))) for k in range(0, n, size)]
                 zs, k = self._logits([{"type": t, "state": state, "question": question,
-                                       "options": [opts[i] for i in g]} for g in groups])
+                                       "options": [opts[i] for i in g]} for g in groups], cut)
                 tok += k
                 if all(z is not None for z in zs):
                     break
@@ -224,14 +226,14 @@ class WaterSheep:
             p = np.zeros(n)
             for g, z in zip(groups, zs):
                 p[g] = sigmoid(z, T)
-            return p, tok
+            return p, tok, any(cut)
         keep = max(1, size // len(groups))
         local, finalists = {}, []
         for g, z in zip(groups, zs):
             pg = softmax(z, T)
             local.update({i: pg[k] for k, i in enumerate(g)})
             finalists += [g[k] for k in np.argsort(-pg)[:keep]]
-        pf, tok2 = self._probs(t, state, question, [opts[i] for i in finalists], size)
+        pf, tok2, cut2 = self._probs(t, state, question, [opts[i] for i in finalists], size)
         p = np.zeros(n)
         for g in groups:
             top = max((i for i in g if i in finalists), key=lambda i: local[i])
@@ -240,7 +242,7 @@ class WaterSheep:
                 p[i] = local[i] * scale
         for k, i in enumerate(finalists):
             p[i] = pf[k]
-        return p / p.sum(), tok + tok2
+        return p / p.sum(), tok + tok2, any(cut) or cut2
 
     def ask(self, request: dict) -> dict:
         """Answer {state, questions} with {model, answers, usage}."""
@@ -257,6 +259,12 @@ class WaterSheep:
                 "usage": {"input_tokens": tokens, "output_tokens": 0}}
 
     def _answer(self, state: str, q: dict):
+        a, n, cut = self._answer_raw(state, q)
+        if cut:
+            a["truncated"] = True
+        return a, n
+
+    def _answer_raw(self, state: str, q: dict):
         t = TYPES_IN.get(str(q.get("type", "")).lower())
         if t is None:
             raise ValueError("unknown question type %r (noul, choice, score or multi)" % q.get("type"))
@@ -269,33 +277,33 @@ class WaterSheep:
             c = crit if isinstance(crit, dict) else {}
             question = noul_question(instr, str(c.get("true", c.get("yes", "")) or ""),
                                      str(c.get("false", c.get("no", "")) or ""))
-            p, n = self._probs("binary", state, question, list(YESNO))
-            return {"type": "noul", "noul": r4(p[0])}, n
+            p, n, cut = self._probs("binary", state, question, list(YESNO))
+            return {"type": "noul", "noul": r4(p[0])}, n, cut
         if t == "score":
             levels = list(crit.values()) if isinstance(crit, dict) else list(crit or [])
             levels = [str(x) for x in levels]
             if not 2 <= len(levels) <= MAX_LEVELS:
                 raise ValueError("score needs 2-%d levels in criteria" % MAX_LEVELS)
-            p, n = self._probs("score", state, instr, levels)
+            p, n, cut = self._probs("score", state, instr, levels)
             return {"type": "score", "score": r4(sum(i * v for i, v in enumerate(p))),
                     "confidence": r4(concentration(p)),
                     "legend": {str(i): l for i, l in enumerate(levels)},
-                    "probabilities": {str(i): r4(v) for i, v in enumerate(p)}}, n
+                    "probabilities": {str(i): r4(v) for i, v in enumerate(p)}}, n, cut
         labels = _labels(crit)
         if not 2 <= len(labels) <= MAX_CHOICES:
             raise ValueError("%s needs 2-%d labels in criteria" % (t, MAX_CHOICES))
         if len({k for k, _ in labels}) != len(labels):
             raise ValueError("labels must be unique")
-        p, n = self._probs(t, state, instr, [text for _, text in labels])
+        p, n, cut = self._probs(t, state, instr, [text for _, text in labels])
         probs = {k: r4(v) for (k, _), v in zip(labels, p)}
         if t == "multi":
             thr = float(q.get("threshold", self.threshold))
             return {"type": "multi", "choices": [k for k, v in probs.items() if v >= thr],
                     "confidence": r4(np.mean([max(v, 1 - v) for v in p])),
-                    "probabilities": probs}, n
+                    "probabilities": probs}, n, cut
         best = max(probs, key=probs.get)
         return {"type": "choice", "choice": best, "confidence": r4(concentration(p)),
-                "probabilities": probs}, n
+                "probabilities": probs}, n, cut
 
     def decide_many(self, items: List[dict]) -> List[dict]:
         """Answer items {state, question, options, type}."""
@@ -306,7 +314,7 @@ class WaterSheep:
             if t == "binary":
                 opts = list(YESNO)
             try:
-                p, _ = self._probs(t, it.get("state") or "", it["question"], opts)
+                p, _, cut = self._probs(t, it.get("state") or "", it["question"], opts)
             except ValueError as e:
                 out.append({"error": str(e)})
                 continue
@@ -323,6 +331,8 @@ class WaterSheep:
                 res["expected"] = float(sum(k * v for k, v in enumerate(p)))
                 if is_digit_scale(opts):
                     res["expected"] += int(opts[0])
+            if cut:
+                res["truncated"] = True
             out.append(res)
         return out
 

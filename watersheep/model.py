@@ -68,8 +68,9 @@ def assemble(tok, q_ids: List[int], opt_ids: List[List[int]], s_ids: List[int],
 
 
 def encode_records(tok, recs: List[dict], max_len: int, max_q: int, max_opt: int,
-                   chunk: int = 2048):
-    """Yield (ids, option positions) per record."""
+                   chunk: int = 2048, cut: Optional[list] = None):
+    """Yield (ids, option positions) per record. `cut` collects, per record, whether any of its text
+    was dropped to fit the input."""
     for i in range(0, len(recs), chunk):
         part = recs[i:i + chunk]
         qs = tok.encode_batch([TYPE_TAG[r["type"]] + " " + r["question"] for r in part])
@@ -79,8 +80,12 @@ def encode_records(tok, recs: List[dict], max_len: int, max_q: int, max_opt: int
         k = 0
         for r, q, s in zip(part, qs, ss):
             n = len(r["options"])
-            opts = [o[:max_opt] for o in os_[k:k + n]]
+            full = os_[k:k + n]
+            opts = [o[:max_opt] for o in full]
             k += n
+            if cut is not None:
+                room = max_len - (3 + min(len(q), max_q) + sum(1 + len(o) for o in opts)) - 1
+                cut.append(len(q) > max_q or any(len(o) > max_opt for o in full) or len(s) > max(0, room))
             yield assemble(tok, q[:max_q], opts, s, max_len)
 
 
