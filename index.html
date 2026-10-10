@@ -195,6 +195,13 @@ ws.ask({
                    <span class="s">"criteria"</span>: [<span class="s">"double charge"</span>, <span class="s">"late delivery"</span>, <span class="s">"damaged item"</span>]},
     },
 })</pre>
+      <h3>Using Jev?</h3>
+      <p>WaterSheep is an open-source alternative to Jev. Run it as a local server:</p>
+<pre>pip install git+https://github.com/SamratDuttaOfficial/WaterSheep
+watersheep --model samratduttaofficial/WaterSheep --serve</pre>
+      <p>It answers Jev's <code>POST /v1/systemone</code> requests on your machine, and TypeSafe's Python SDK works against it without code changes:</p>
+<pre>export TYPESAFE_BASE_URL=http://127.0.0.1:8766</pre>
+      <p>Any API key value works locally. Multi-label questions (<code>"type": "multi"</code>) work too, as plain JSON. WaterSheep is independent and not affiliated with TypeSafe AI.</p>
       <h3>Download</h3>
 <pre>hf download samratduttaofficial/WaterSheep --local-dir WaterSheep</pre>
       <p>Or with Git (requires <a href="https://git-lfs.com">Git LFS</a>):</p>
