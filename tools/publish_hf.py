@@ -211,7 +211,8 @@ def front_matter(meta: dict) -> str:
              "pipeline_tag: zero-shot-classification"]
     if HUB_ID.match(base):
         lines.append("base_model: %s" % base)
-    lines += ["tags:", "- decision-model", "- calibration", "- multi-label"]
+    lines += ["tags:", "- decision-model", "- calibration", "- multi-label", "- jev", "- jev-alternative",
+              "- system-one"]
     ds = train_datasets()
     if ds:
         lines += ["datasets:"] + ["- %s" % x for x in ds]
