@@ -28,6 +28,12 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
+[project.urls]
+Homepage = "https://samratduttaofficial.github.io/WaterSheep/"
+Source = "https://github.com/SamratDuttaOfficial/WaterSheep"
+Model = "https://huggingface.co/samratduttaofficial/WaterSheep"
+Issues = "https://github.com/SamratDuttaOfficial/WaterSheep/issues"
+
 [project.scripts]
 watersheep = "watersheep.cli:main"
 

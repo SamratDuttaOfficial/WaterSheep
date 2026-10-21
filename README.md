@@ -1,10 +1,10 @@
-![WaterSheep](assets/banner.svg)
+![WaterSheep](https://samratduttaofficial.github.io/WaterSheep/banner.svg)
 
-# ![](assets/logo.svg) WaterSheep
+# ![](https://samratduttaofficial.github.io/WaterSheep/logo.svg) WaterSheep
 
 Calibrated decisions for any text.
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/LICENSE)
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-model-yellow)](https://huggingface.co/samratduttaofficial/WaterSheep)
 [![Demo](https://img.shields.io/badge/demo-online-brightgreen)](https://huggingface.co/spaces/samratduttaofficial/WaterSheep)
 
@@ -154,11 +154,11 @@ watersheep --model samratduttaofficial/WaterSheep --question "Which team should 
 
 ECE is the expected calibration error (lower is better).
 
-![Calibration by question type](results/figures/reliability.svg)
+![Calibration by question type](https://samratduttaofficial.github.io/WaterSheep/figures/reliability.svg)
 
 Accuracy against confidence for each question type, before (raw) and after calibration.
 
-![Error against coverage](results/figures/coverage.svg)
+![Error against coverage](https://samratduttaofficial.github.io/WaterSheep/figures/coverage.svg)
 
 Error among the questions answered when the model only answers above a confidence threshold. The dots mark thresholds of 0.70, 0.90 and 0.97.
 
@@ -186,14 +186,14 @@ Error among the questions answered when the model only answers above a confidenc
 ## Training
 
 - Base model: [answerdotai/ModernBERT-base](https://huggingface.co/answerdotai/ModernBERT-base), fine-tuned with a decision head.
-- Data: openly licensed public datasets (listed in [NOTICE](NOTICE)) and synthetic decisions from Qwen3.5-4B.
+- Data: openly licensed public datasets (listed in [NOTICE](https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE)) and synthetic decisions from Qwen3.5-4B.
 - Calibration: a temperature per question type, fitted on a validation split.
 
-![Training curves](results/figures/training.svg)
+![Training curves](https://samratduttaofficial.github.io/WaterSheep/figures/training.svg)
 
 Training loss and learning rate (left); validation accuracy by question type (right).
 
-![Synthetic data verification](results/figures/synth.svg)
+![Synthetic data verification](https://samratduttaofficial.github.io/WaterSheep/figures/synth.svg)
 
 Share of synthetic examples kept after verification, by question type (left) and by family (right).
 
@@ -217,7 +217,7 @@ Use `scripts\run.bat` on Windows.
 
 ### Results
 
-The figures, tables and data are in [`results/`](results). To remake them after training and
+The figures, tables and data are in [`results/`](https://github.com/SamratDuttaOfficial/WaterSheep/tree/main/results). To remake them after training and
 `scripts/run-benchmarks.sh` (`.bat` on Windows), run these from the project root with the Python in `.venv`:
 
 | Script | Needs | Writes to `results/` |
@@ -231,7 +231,7 @@ Each uses the newest model unless `--model` is given.
 
 ## License
 
-Apache 2.0 ([LICENSE](LICENSE)). Attributions: [NOTICE](NOTICE).
+Apache 2.0 ([LICENSE](https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/LICENSE)). Attributions: [NOTICE](https://github.com/SamratDuttaOfficial/WaterSheep/blob/main/NOTICE).
 
 ## Citation
 
@@ -247,6 +247,6 @@ Apache 2.0 ([LICENSE](LICENSE)). Attributions: [NOTICE](NOTICE).
 ---
 
 <p align="center">
-  <a href="https://doi.org/10.13140/RG.2.2.28606.45122"><img src="assets/preprint.svg" alt="Read the preprint" width="400"></a>
-  <a href="https://buymeacoffee.com/samratdutta"><img src="assets/coffee.svg" alt="Buy me a coffee" width="400"></a>
+  <a href="https://doi.org/10.13140/RG.2.2.28606.45122"><img src="https://samratduttaofficial.github.io/WaterSheep/preprint.svg" alt="Read the preprint" width="400"></a>
+  <a href="https://buymeacoffee.com/samratdutta"><img src="https://samratduttaofficial.github.io/WaterSheep/coffee.svg" alt="Buy me a coffee" width="400"></a>
 </p>
