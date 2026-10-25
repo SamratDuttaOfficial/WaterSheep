@@ -474,6 +474,8 @@ def _toy(src: Src, cfg, want: int, seed: int) -> List[dict]:
 
 
 def enabled(cfg) -> List[Src]:
+    if not getattr(cfg, "use_public_sources", True):
+        return []
     names = cfg.sources or list(registry())
     out = []
     for n in names:

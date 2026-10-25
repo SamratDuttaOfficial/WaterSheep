@@ -95,6 +95,37 @@ def unit_tests():
     check(not d.seen({"state": "Completely different text about payroll dates and taxes.",
                       "question": "Is it late?"}), "dedup keeps different text")
 
+    from watersheep.data.semantic import graph_records
+    from watersheep.data.imports import load_records
+    nodes = [
+        {"id": "a", "title": "Alpha", "cluster": "x", "summary": "first concept"},
+        {"id": "b", "title": "Beta", "cluster": "x", "summary": "second concept"},
+        {"id": "c", "title": "Gamma", "cluster": "x", "summary": "third concept"},
+        {"id": "d", "title": "Delta", "cluster": "x", "summary": "fourth concept"},
+    ]
+    sem = graph_records(nodes, [{"id": "e1", "source": "a", "target": "b",
+                                 "relation": "maps_to", "kind": "verified"}],
+                        cfg, negatives=2, seed=7, source_name="selftest")
+    check(len(sem) == 1 and validate(sem[0])[0] and
+          sem[0]["options"][sem[0]["answer"]] == "Beta",
+          "semantic graph edge -> valid WaterSheep relation-completion record")
+    HOME.mkdir(parents=True, exist_ok=True)
+    imp = HOME / "semantic-records.jsonl"
+    imp.write_text(__import__("json").dumps(sem[0]) + "\n", encoding="utf-8")
+    loaded = load_records(str(imp), cfg)
+    check(len(loaded) == 1 and loaded[0]["id"].startswith("sem:e1-"),
+          "strict local record import accepts valid semantic NDJSON")
+    cfg_no_public = Config(use_public_sources=False)
+    check(S.enabled(cfg_no_public) == [], "public dataset loading can be disabled for local-only training")
+    bad = HOME / "bad-semantic-records.jsonl"
+    bad.write_text('{"type":"choice"}\n', encoding="utf-8")
+    rejected = False
+    try:
+        load_records(str(bad), cfg)
+    except ValueError:
+        rejected = True
+    check(rejected, "strict local record import rejects invalid WaterSheep NDJSON")
+
 
 def watch_and_stop(step: int):
     """Request a stop once training passes `step`."""
