@@ -11,6 +11,22 @@ import json
 import sys
 import time
 
+_DISCONNECT_ERRORS = (BrokenPipeError, ConnectionResetError, ConnectionAbortedError)
+
+
+def _send_json(handler, code: int, obj) -> bool:
+    """Send one JSON response; return False if the client disconnected."""
+    data = json.dumps(obj, ensure_ascii=False).encode("utf-8")
+    try:
+        handler.send_response(code)
+        handler.send_header("Content-Type", "application/json")
+        handler.send_header("Content-Length", str(len(data)))
+        handler.end_headers()
+        handler.wfile.write(data)
+    except _DISCONNECT_ERRORS:
+        return False
+    return True
+
 
 def serve(ws, port: int) -> None:
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -27,17 +43,13 @@ def serve(ws, port: int) -> None:
             try:
                 req = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)))
                 with lock:
-                    self._send(200, ws.ask(req))
+                    result = ws.ask(req)
             except Exception as e:
-                self._send(400, {"error": str(e)})
+                return self._send(400, {"error": str(e)})
+            self._send(200, result)
 
         def _send(self, code, obj):
-            data = json.dumps(obj, ensure_ascii=False).encode("utf-8")
-            self.send_response(code)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(data)))
-            self.end_headers()
-            self.wfile.write(data)
+            return _send_json(self, code, obj)
 
     srv = ThreadingHTTPServer(("127.0.0.1", port), H)
     print("serving %s on http://127.0.0.1:%d/v1/decisions  (Ctrl+C to stop)" % (ws.name, port))
