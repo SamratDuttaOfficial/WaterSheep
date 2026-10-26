@@ -174,11 +174,19 @@ STAGE_DEPS: Dict[str, List[str]] = {
 }
 
 
+_LATE_DEFAULTS = {"use_public_sources": True, "record_imports": [], "init_model": ""}
+
+
 def stage_hashes(cfg: Config, order: List[str]) -> Dict[str, str]:
     d = cfg.as_dict()
     out: Dict[str, str] = {}
     for name in order:
         own = {k: d.get(k) for k in STAGE_KEYS.get(name, [])}
+        # Options added after the first release only count once they differ from their
+        # defaults, so existing runs don\'t redo every stage after an upgrade.
+        for k, default in _LATE_DEFAULTS.items():
+            if k in own and own[k] == default:
+                del own[k]
         if name == "sources":
             from ..data.sources import REGISTRY
             from ..data.imports import fingerprint
@@ -190,7 +198,8 @@ def stage_hashes(cfg: Config, order: List[str]) -> Dict[str, str]:
                     imports.append((p, fingerprint(p)))
                 except OSError:
                     imports.append((p, None))
-            own["_record_imports"] = imports
+            if imports:
+                own["_record_imports"] = imports
         elif name == "build":
             from ..data.corpus import digest
             own["_edits"] = digest()
