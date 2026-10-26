@@ -25,7 +25,9 @@ class Config:
 
     sources: List[str] = field(default_factory=list)  # empty = all
     exclude_sources: List[str] = field(default_factory=list)
+    use_public_sources: bool = True
     use_kaggle: bool = True
+    record_imports: List[str] = field(default_factory=list)  # local WaterSheep NDJSON; never copied to repo
     per_source_max: int = 5000
     heldout_sources: List[str] = field(default_factory=lambda: [
         "kg:sarcasm", "kg:news_category", "hf:qasc", "kg:phone_reviews"])
@@ -62,6 +64,7 @@ class Config:
     score_neighbor_mass: float = 0.15
 
     encoder: str = "answerdotai/ModernBERT-base"
+    init_model: str = ""  # optional WaterSheep export/HF repo used to warm-start all weights
     max_len: int = 512
     max_question_tokens: int = 96
     max_option_tokens: int = 32
@@ -135,8 +138,9 @@ class Config:
 STAGE_KEYS: Dict[str, List[str]] = {
     "env":       [],
     "teacher":   ["llm_model"],
-    "sources":   ["sources", "exclude_sources", "use_kaggle", "per_source_max",
-                  "max_state_chars", "max_option_chars", "max_options", "seed"],
+    "sources":   ["sources", "exclude_sources", "use_public_sources", "use_kaggle",
+                  "record_imports", "per_source_max", "max_state_chars", "max_option_chars",
+                  "max_options", "seed"],
     "audit":     ["audit_per_source", "audit_drop_below_chance"],
     "synth":     ["synth_target", "verify_orders", "verify_min_p",
                   "verify_min_quality", "soft_label_mix", "synth_multi_share", "verify_relabel_conf"],
@@ -144,7 +148,7 @@ STAGE_KEYS: Dict[str, List[str]] = {
     "build":     ["heldout_sources", "synth_repeat", "val_fraction", "test_fraction",
                   "label_smoothing", "score_neighbor_mass", "seed", "aug_descriptions",
                   "aug_levels", "aug_criteria", "aug_to_multi"],
-    "train":     ["encoder", "max_len", "max_question_tokens", "max_option_tokens",
+    "train":     ["encoder", "init_model", "max_len", "max_question_tokens", "max_option_tokens",
                   "head_layers", "head_dropout", "epochs", "lr", "head_lr",
                   "weight_decay", "warmup_ratio", "min_lr_ratio",
                   "target_batch_examples", "grad_clip", "amp_dtype", "seed"],
@@ -170,15 +174,32 @@ STAGE_DEPS: Dict[str, List[str]] = {
 }
 
 
+_LATE_DEFAULTS = {"use_public_sources": True, "record_imports": [], "init_model": ""}
+
+
 def stage_hashes(cfg: Config, order: List[str]) -> Dict[str, str]:
     d = cfg.as_dict()
     out: Dict[str, str] = {}
     for name in order:
         own = {k: d.get(k) for k in STAGE_KEYS.get(name, [])}
+        # Options added after the first release only count once they differ from their
+        # defaults, so existing runs don\'t redo every stage after an upgrade.
+        for k, default in _LATE_DEFAULTS.items():
+            if k in own and own[k] == default:
+                del own[k]
         if name == "sources":
             from ..data.sources import REGISTRY
+            from ..data.imports import fingerprint
             own["_catalog"] = sorted(n if s.version == 1 else "%s@%d" % (n, s.version)
                                      for n, s in REGISTRY.items())
+            imports = []
+            for p in cfg.record_imports:
+                try:
+                    imports.append((p, fingerprint(p)))
+                except OSError:
+                    imports.append((p, None))
+            if imports:
+                own["_record_imports"] = imports
         elif name == "build":
             from ..data.corpus import digest
             own["_edits"] = digest()

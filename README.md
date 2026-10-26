@@ -213,6 +213,40 @@ cd WaterSheep
 ./scripts/run.sh
 ```
 
+### Fine-tune existing WaterSheep weights on local decision records
+
+WaterSheep can warm-start from an existing WaterSheep export or Hugging Face model and train on
+local WaterSheep-format NDJSON without copying that data into the repository.
+
+A typed semantic graph can first be projected into relation-completion decisions:
+
+```bash
+python tools/semantic_graph_to_records.py \
+  --nodes /path/to/concepts.json \
+  --edges /path/to/relations.json \
+  --out /path/to/semantic-records.jsonl \
+  --source-name my-semantic-graph
+```
+
+Then fine-tune the published WaterSheep weights on those local records:
+
+```bash
+python -m watersheep.run \
+  --set use_public_sources=false \
+  --set record_imports=/path/to/semantic-records.jsonl \
+  --set init_model=samratduttaofficial/WaterSheep \
+  --set audit_per_source=0 \
+  --set synth_target=0
+```
+
+`record_imports` are explicit local inputs: a missing, empty, or malformed configured import stops the sources stage. The files are fingerprinted
+for stage invalidation, and their contents are not added to this repository. Imported records are taken as supplied and are not teacher-audited. The graph converter only
+projects edges already present in the supplied graph; it does not infer or verify new semantic claims.
+
+For a serious generalization benchmark, separate held-out semantic families before conversion rather
+than treating the pipeline's random train/validation/test split as evidence of relational transfer.
+
+
 Use `scripts\run.bat` on Windows.
 
 ### Results
