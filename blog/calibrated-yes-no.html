@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A yes that knows how sure it is · WaterSheep</title>
+<meta name="description" content="Why a yes/no answer should come with a probability you can trust, and how to use that probability to decide when to let a model answer on its own.">
+<meta property="og:title" content="A yes that knows how sure it is">
+<meta property="og:description" content="Why a yes/no answer should come with a probability you can trust, and how to use it.">
+<meta property="og:type" content="article">
+<meta name="theme-color" content="#0e7490">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f7fafc; --surface: #ffffff; --text: #0f172a; --muted: #475569; --line: #e2e8f0;
+    --accent: #0e7490; --accent-2: #0891b2; --accent-soft: #e0f2fe; --code-bg: #0f172a; --code-text: #e2e8f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1220; --surface: #111a2e; --text: #e5edf7; --muted: #9fb0c6; --line: #1f2a44;
+      --accent: #22d3ee; --accent-2: #67e8f9; --accent-soft: #0c2a3a; --code-bg: #0a0f1c; --code-text: #d7e3f4;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.7 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+  header.top { border-bottom: 1px solid var(--line); background: var(--surface); }
+  header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; max-width: 1040px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--text); text-decoration: none; }
+  nav a { margin-left: 18px; color: var(--muted); text-decoration: none; font-size: 15px; }
+  nav a:hover { color: var(--accent); }
+  article { padding: 40px 0 56px; }
+  h1 { font-size: clamp(30px, 5vw, 40px); line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 8px; }
+  .meta { color: var(--muted); font-size: 14px; margin: 0 0 32px; }
+  h2 { font-size: 22px; margin: 36px 0 8px; }
+  pre {
+    background: var(--code-bg); color: var(--code-text); padding: 14px 16px; border-radius: 10px; overflow-x: auto;
+    font: 14px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
+  figure { margin: 24px 0; }
+  figure img { width: 100%; height: auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+  figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 16px 0; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  th { color: var(--muted); font-weight: 600; background: var(--accent-soft); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; padding: 20px 0; }
+  @media (max-width: 560px) { nav a:not(.gh) { display: none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../"><img src="../logo.svg" alt="" width="30" height="30">WaterSheep</a>
+    <nav>
+      <a href="../#demo">Demo</a>
+      <a href="../#start">Get started</a>
+      <a class="gh" href="https://github.com/SamratDuttaOfficial/WaterSheep">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+<article>
+  <h1>A yes that knows how sure it is</h1>
+  <p class="meta">Samrat Dutta · 12 November 2026</p>
+
+  <p>Most of the questions I want software to answer about text are small. Is this email a complaint? Which
+  team should get this ticket? Does this review mention delivery? Is this retrieved passage relevant to the
+  question?</p>
+
+  <p>A plain "yes" or "billing" isn't enough for any of them. I also want to know how likely the answer is to
+  be right, because that decides what happens next: act on it, or pass it to a person.</p>
+
+  <h2>What calibrated means</h2>
+
+  <p>A model is calibrated when its confidence matches how often it's right. Take every answer it gives with
+  80% confidence, and about 80% of them should be correct. Take the ones at 95%, and about 95% should be.</p>
+
+  <p>That sounds obvious, but most models don't do it out of the box. Neural classifiers tend to be
+  overconfident. Asking a chat model to "rate your confidence from 0 to 100" gives you a number, but not one
+  that matches how often it's actually right. If the number doesn't mean anything, you can't set a rule on
+  it.</p>
+
+  <p>The usual measure is expected calibration error (ECE): group answers by confidence and average the gap
+  between confidence and accuracy in each group. Lower is better, and zero means the confidence is exactly
+  right.</p>
+
+  <h2>Why it matters more than accuracy</h2>
+
+  <p>Accuracy is one number for the whole dataset. In practice, you rarely have to answer everything. If the
+  confidence is honest, you can let the model handle the answers it's sure about and send the rest to a
+  person.</p>
+
+  <p>Here is what that looks like with <a href="https://github.com/SamratDuttaOfficial/WaterSheep">WaterSheep</a>,
+  the decision model I've been building. On its test split it's right 77.8% of the time when it answers
+  everything. Set a confidence threshold and it answers fewer questions, with far fewer mistakes:</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Only answer above</th><th class="num">Questions answered</th><th class="num">Error rate</th></tr></thead>
+    <tbody>
+      <tr><td>no threshold</td><td class="num">100%</td><td class="num">22.2%</td></tr>
+      <tr><td>0.70</td><td class="num">71%</td><td class="num">9.5%</td></tr>
+      <tr><td>0.90</td><td class="num">53%</td><td class="num">3.4%</td></tr>
+      <tr><td>0.95</td><td class="num">41%</td><td class="num">1.8%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The same holds on datasets it never saw in training, which is the harder test. Overall accuracy there is
+  61.2%, but at a 0.90 threshold it answers 38% of the questions with a 4.9% error rate.</p>
+
+  <figure>
+    <img src="../figures/coverage.svg" alt="Error rate against the share of questions answered, for the test split and the held-out datasets">
+    <figcaption>Error among the questions answered, as the threshold rises. The dots mark 0.70, 0.90 and 0.97.</figcaption>
+  </figure>
+
+  <p>So a model that's only right 61% of the time overall can still take over a third of the work almost
+  without mistakes. That only works because the confidence is honest: WaterSheep's ECE is 0.026 on the test
+  split and 0.043 on the held-out datasets.</p>
+
+  <h2>How it's done</h2>
+
+  <p>WaterSheep reads the text and the question together in one encoder pass and scores every option. Then a
+  small calibration step, fitted on held-out answers for each question type, maps the raw scores to
+  probabilities that match the observed accuracy.</p>
+
+  <figure>
+    <img src="../figures/reliability.svg" alt="Accuracy against confidence for each question type, before and after calibration">
+    <figcaption>Accuracy against confidence for each question type, before (raw) and after calibration. On the
+    diagonal is perfect.</figcaption>
+  </figure>
+
+  <h2>Using it</h2>
+
+  <p>Every answer comes with a probability for each option, so the threshold rule is one line:</p>
+
+<pre>from transformers import pipeline
+
+ws = pipeline(model="samratduttaofficial/WaterSheep", trust_remote_code=True)
+a = ws("The parcel arrived broken and nobody answers the phone.",
+       question="Is this a complaint?")
+
+if a["p_yes"] &gt;= 0.9:
+    handle_complaint()
+elif a["p_yes"] &lt;= 0.1:
+    archive()
+else:
+    send_to_a_person()</pre>
+
+  <p>It also runs as a local server (<code>watersheep --serve</code>), and there are LangChain and LlamaIndex
+  integrations. The LlamaIndex one drops retrieved passages the model judges irrelevant, using the same
+  probability as the cut-off.</p>
+
+  <h2>Where it falls short</h2>
+
+  <p>It's English only, long inputs are truncated, rating questions are its weakest type, and some datasets
+  are hard for it (GoEmotions is 22%). Calibration also tells you when it's unsure; it doesn't make it right.
+  It shouldn't make high-stakes decisions on its own.</p>
+
+  <p>The code, weights and training pipeline are open under Apache 2.0. You can
+  <a href="../#demo">try it in the browser</a>, or read the
+  <a href="https://github.com/SamratDuttaOfficial/WaterSheep">code on GitHub</a>. I'd like to hear where it
+  fails on your data.</p>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">© 2026 Samrat Dutta · Apache 2.0 · <a href="../">WaterSheep</a></div>
+</footer>
+</body>
+</html>
