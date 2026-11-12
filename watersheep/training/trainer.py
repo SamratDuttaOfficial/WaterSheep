@@ -155,6 +155,15 @@ def train(*, cfg, run_dir: Path, run_id: str, tok_dir: Path, pad: int, encoder_s
     last, best_path = run_dir / "last.pt", run_dir / "best.pt"
 
     model = build_model(cfg, encoder_spec).to(device)
+    if cfg.init_model and not last.exists():
+        from ..infer import WaterSheep
+        LOG.info("warm-starting model weights from %s", cfg.init_model)
+        initial = WaterSheep.load(cfg.init_model, device="cpu")
+        try:
+            model.load_state_dict(initial.net.state_dict(), strict=True)
+        except RuntimeError as e:
+            raise RuntimeError("init_model is not architecture-compatible with this training config: %s" % e) from e
+        del initial
     groups = model.param_groups(cfg.lr, cfg.head_lr, cfg.weight_decay)
     try:
         opt = torch.optim.AdamW(groups, betas=(0.9, 0.98), eps=1e-6, fused=device.type == "cuda")
@@ -211,6 +220,7 @@ def train(*, cfg, run_dir: Path, run_id: str, tok_dir: Path, pad: int, encoder_s
     LOG.info("training %s: %s examples, %d steps of ~%d examples, %d tokens/batch, device %s",
              run_id, human_num(n_tr), total, cfg.target_batch_examples, bt, device)
     write_json(run_dir / "run.json", {"run_id": run_id, "encoder": str(encoder_spec),
+                                      "init_model": cfg.init_model or None,
                                       "train_examples": n_tr, "steps": total,
                                       "batch_tokens": bt, "config": cfg.as_dict()})
 

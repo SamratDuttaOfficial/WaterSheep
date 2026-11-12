@@ -103,6 +103,9 @@ def clean_env(cfg) -> None:
 
 
 def run_teacher(cfg, man, reg, h) -> dict:
+    if not cfg.use_public_sources and cfg.synth_target <= 0:
+        LOG.info("teacher skipped: local-record-only training with synth_target=0")
+        return {"skipped": "local-record-only"}
     from ..core.pool import pool_map
     from ..synth.generate import make_example
     from ..data.taxonomy import job
@@ -140,9 +143,10 @@ def run_sources(cfg, man, reg, h) -> dict:
     from ..data import sources as S
     from ..data.dataset import raw_file
     pin_caches()
-    counts, failed = {}, {}
+    from ..data.imports import batch_name, fingerprint, load_records
+    counts, failed, raw_names = {}, {}, []
     todo = S.enabled(cfg)
-    LOG.info("%d public sources enabled", len(todo))
+    LOG.info("%d public sources enabled; %d local record imports", len(todo), len(cfg.record_imports))
     for k, src in enumerate(todo, 1):
         interrupt.check("sources stopped - finished sources are kept")
         f = raw_file(src.name)
@@ -150,6 +154,7 @@ def run_sources(cfg, man, reg, h) -> dict:
         key = _source_key(cfg, src.name)
         if marker.get("key") == key and f.exists():
             counts[src.name] = marker.get("n", 0)
+            raw_names.append(src.name)
             continue
         LOG.info("[%d/%d] %s  (%s)", k, len(todo), src.name, src.hf or src.kaggle or "built-in")
         t0 = time.time()
@@ -169,13 +174,35 @@ def run_sources(cfg, man, reg, h) -> dict:
         write_jsonl(f, recs)
         write_json(f.with_suffix(".done"), {"key": key, "n": len(recs), "when": now_ts()})
         counts[src.name] = len(recs)
+        raw_names.append(src.name)
         by = collections.Counter("+".join(r["options"][a] for a in answers(r)) or "(none)"
                                  for r in recs)
         LOG.info("  %d records in %.0fs  (answers: %s)", len(recs), time.time() - t0,
                  ", ".join("%s=%d" % kv for kv in by.most_common(4)))
-    write_json(P.reports / "sources.json", {"counts": counts, "failed": failed})
+    for i, path in enumerate(cfg.record_imports):
+        interrupt.check("sources stopped - finished record imports are kept")
+        name = batch_name(path, i)
+        f = raw_file(name)
+        fp = fingerprint(path)
+        key = sha1({"v": 1, "path": str(Path(path).expanduser()), "sha256": fp,
+                    "max_options": cfg.max_options})
+        marker = read_json(f.with_suffix(".done"), {}) or {}
+        if marker.get("key") == key and f.exists():
+            counts[name] = marker.get("n", 0)
+            raw_names.append(name)
+            continue
+        recs = load_records(path, cfg)
+        write_jsonl(f, recs)
+        write_json(f.with_suffix(".done"), {"key": key, "n": len(recs), "when": now_ts()})
+        counts[name] = len(recs)
+        raw_names.append(name)
+        LOG.info("  imported %d local records from %s", len(recs), path)
+
+    write_json(P.reports / "sources.json",
+               {"counts": counts, "failed": failed, "raw_names": raw_names,
+                "record_imports": list(cfg.record_imports)})
     if not counts:
-        raise RuntimeError("no public source could be loaded - check the network")
+        raise RuntimeError("no public source or local record import could be loaded")
     LOG.info("sources: %d loaded (%s records), %d skipped", len(counts),
              human_num(sum(counts.values())), len(failed))
     return {"sources": len(counts), "records": sum(counts.values()), "failed": sorted(failed)}
@@ -429,7 +456,11 @@ def run_describe(cfg, man, reg, h) -> dict:
     from ..data.dataset import raw_file, synth_records
     from ..data.sources import enabled
     names = [s.name for s in enabled(cfg) if raw_file(s.name).exists()]
-    return describe.run(cfg, llm.get_teacher(cfg), names, synth_records())
+    synth = list(synth_records())
+    if not names and not synth:
+        LOG.info("describe skipped: no public or synthetic records")
+        return {"skipped": True, "label_sets": 0, "scales": 0, "criteria": 0}
+    return describe.run(cfg, llm.get_teacher(cfg), names, synth)
 
 
 def clean_describe(cfg) -> None:
@@ -440,7 +471,9 @@ def clean_describe(cfg) -> None:
 def run_build(cfg, man, reg, h) -> dict:
     from ..data.dataset import build, raw_file
     from ..data.sources import enabled
-    names = [s.name for s in enabled(cfg) if raw_file(s.name).exists()]
+    src_report = read_json(P.reports / "sources.json", {}) or {}
+    names = [n for n in (src_report.get("raw_names") or
+                         [s.name for s in enabled(cfg)]) if raw_file(n).exists()]
     audit = read_json(P.reports / "audit.json", {}) or {}
     dropped = audit.get("dropped", []) if cfg.audit_drop_below_chance else []
     stats = build(cfg, names, dropped)
