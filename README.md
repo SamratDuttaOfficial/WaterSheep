@@ -11,7 +11,8 @@ Calibrated decisions for any text.
 [Website](https://samratduttaofficial.github.io/WaterSheep/) ·
 [Demo](https://huggingface.co/spaces/samratduttaofficial/WaterSheep) ·
 [Model](https://huggingface.co/samratduttaofficial/WaterSheep) ·
-[Video](https://youtu.be/VjSiBecOiRI)
+[Video](https://youtu.be/VjSiBecOiRI) ·
+[Blog](https://samratduttaofficial.github.io/WaterSheep/blog/calibrated-yes-no.html)
 
 WaterSheep answers yes/no, single-choice, rating and multi-label questions about any text, with a
 probability for every option.
