@@ -20,7 +20,11 @@ dependencies = [
     "safetensors>=0.4",
     "huggingface_hub>=0.34",
 ]
-keywords = ["decision model", "classification", "zero-shot", "calibration"]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.3"]
+llamaindex = ["llama-index-core>=0.12"]
+keywords = ["decision model", "classification", "zero-shot", "calibration", "langchain", "llamaindex"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",

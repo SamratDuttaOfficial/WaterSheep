@@ -145,6 +145,35 @@ watersheep --model samratduttaofficial/WaterSheep --question "Which team should 
 
 `--serve` runs a local HTTP API on port 8766.
 
+## Use with LangChain and LlamaIndex
+
+```bash
+pip install "watersheep[langchain,llamaindex] @ git+https://github.com/SamratDuttaOfficial/WaterSheep"
+```
+
+A LangChain Runnable, so it fits in any chain:
+
+```python
+from watersheep.integrations.langchain import WaterSheepRunnable
+
+route = WaterSheepRunnable("samratduttaofficial/WaterSheep",
+                           question="Which team should handle this?", options=["billing", "shipping", "support"])
+route.invoke("I was charged twice.")
+```
+
+A LlamaIndex node postprocessor that drops retrieved passages the model judges irrelevant to the query:
+
+```python
+from watersheep.integrations.llamaindex import WaterSheepRelevanceFilter
+
+engine = index.as_query_engine(similarity_top_k=10,
+                               node_postprocessors=[WaterSheepRelevanceFilter(url="http://127.0.0.1:8766", threshold=0.5)])
+```
+
+Each takes a model (anything `WaterSheep.load` accepts) or `url=` for a running `watersheep --serve`.
+For agents, `watersheep_tool` (LangChain) and `watersheep_function_tool` (LlamaIndex) answer yes/no and
+classification questions with a probability for every option.
+
 ## Evaluation
 
 | Evaluation | Accuracy | ECE |
