@@ -66,3 +66,11 @@ agent.md
 AGENT.md
 agents.md
 AGENTS.md
+CLAUDE.md
+GEMINI.md
+.claude/
+.cursor/
+.codex/
+.gemini/
+.windsurf/
+.aider*
